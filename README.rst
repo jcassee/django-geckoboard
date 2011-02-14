@@ -1,7 +1,7 @@
 django-geckoboard
 =================
 
-Geckoboard is a hosted, real-time status board serving up indicators
+Geckoboard_ is a hosted, real-time status board serving up indicators
 from web analytics, CRM, support, infrastructure, project management,
 sales, etc.  It can be connected to virtually any source of quantitative
 data.
@@ -15,7 +15,8 @@ Or use Git to get the development version from the `project page`_::
 
     $ git clone git://github.com/jcassee/django-geckoboard.git
 
-See the ``geckoboard`` package docstring for documentation.
+See the ``geckoboard`` package docstring or the `PyPI page`_ for
+documentation.
 
 If you want to help out with the development of django-geckoboard, by
 posting detailed bug reports, proposing new features or other analytics
@@ -32,6 +33,6 @@ project source code and issue tracker.
 
 .. _Django: http://www.djangoproject.com/
 .. _Geckoboard: http://www.geckoboard.com/
-.. _`PyPI page`: http://pypi.python.org/django/geckoboard
+.. _`PyPI page`: http://pypi.python.org/pypi/django-geckoboard
 .. _`project page`: http://github.com/jcassee/django-geckoboard
 .. _`issue tracker`: http://github.com/jcassee/django-geckoboard/issues
