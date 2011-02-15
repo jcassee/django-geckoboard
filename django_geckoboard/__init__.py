@@ -239,6 +239,6 @@ last 24 hours::
 
 __author__ = "Joost Cassee"
 __email__ = "joost@cassee.net"
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 __copyright__ = "Copyright (C) 2011 Joost Cassee"
 __license__ = "MIT License"

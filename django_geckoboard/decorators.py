@@ -31,8 +31,9 @@ class WidgetDecorator(object):
     serialization to XML or JSON for Geckoboard.  See the Geckoboard
     API docs or the source of extending classes for details.
 
-    If the GECKOBOARD_API_KEY setting is used, the request must contain
-    the correct API key, or a 403 Forbidden response is returned.
+    If the ``GECKOBOARD_API_KEY`` setting is used, the request must
+    contain the correct API key, or a 403 Forbidden response is
+    returned.
     """
     def __call__(self, view_func):
         def _wrapped_view(request, *args, **kwargs):
@@ -54,7 +55,7 @@ widget = WidgetDecorator()
 
 class NumberWidgetDecorator(WidgetDecorator):
     """
-    Geckoboard number widget decorator.
+    Geckoboard Number widget decorator.
 
     The decorated view must return a tuple `(current, [previous])`, where
     `current` is the current value and `previous` is the previous value
@@ -71,7 +72,7 @@ number_widget = NumberWidgetDecorator()
 
 class RAGWidgetDecorator(WidgetDecorator):
     """
-    Geckoboard red-amber-green widget decorator.
+    Geckoboard Red-Amber-Green (RAG) widget decorator.
 
     The decorated view must return a tuple with three tuples `(value,
     [text])`.  The `value` parameters are the numbers shown in red,
@@ -100,11 +101,11 @@ rag_widget = RAGWidgetDecorator()
 
 class TextWidgetDecorator(WidgetDecorator):
     """
-    Geckoboard text widget decorator.
+    Geckoboard Text widget decorator.
 
-    The decorated view must return a list of tuples *(message, [type])*.
-    The *message* parameters are strings that will be shown in the
-    widget.  The *type* parameters are optional and tell Geckoboard how
+    The decorated view must return a list of tuples `(message, [type])`.
+    The `message` parameters are strings that will be shown in the
+    widget.  The `type` parameters are optional and tell Geckoboard how
     to annotate the messages.  Use ``TEXT_INFO`` for informational
     messages, ``TEXT_WARN`` for for warnings and ``TEXT_NONE`` for plain
     text (the default).
@@ -131,7 +132,7 @@ text_widget = TextWidgetDecorator()
 
 class PieChartWidgetDecorator(WidgetDecorator):
     """
-    Geckoboard pie chart widget decorator.
+    Geckoboard Pie chart decorator.
 
     The decorated view must return a list of tuples `(value, label,
     color)`.  The color parameter is a string 'RRGGBB[TT]' representing
@@ -157,15 +158,15 @@ pie_chart = PieChartWidgetDecorator()
 
 class LineChartWidgetDecorator(WidgetDecorator):
     """
-    Geckoboard line chart widget decorator.
+    Geckoboard Line chart decorator.
 
-    The decorated view must return a tuple (values, x_axis, y_axis,
-    color).  The value parameter is a tuple or list of data points.  The
-    x-axis parameter is a label string, or a tuple or list of strings,
-    that will be placed on the X-axis.  The y-axis parameter works
-    similarly for the Y-axis.  If there are more axis labels, they are
-    placed evenly along the axis.  The color parameter is a string
-    'RRGGBB[TT]' representing red, green, blue and optionally
+    The decorated view must return a tuple `(values, x_axis, y_axis,
+    [color])`.  The `values` parameter is a list of data points.  The
+    `x-axis` parameter is a label string or a list of strings, that will
+    be placed on the X-axis.  The `y-axis` parameter works similarly for
+    the Y-axis.  If there are more than one axis label, they are placed
+    evenly along the axis.  The optional `color` parameter is a string
+    ``'RRGGBB[TT]'`` representing red, green, blue and optionally
     transparency.
     """
 
@@ -200,13 +201,14 @@ line_chart = LineChartWidgetDecorator()
 
 class GeckOMeterWidgetDecorator(WidgetDecorator):
     """
-    Geckoboard Geck-O-Meter widget decorator.
+    Geckoboard Geck-O-Meter decorator.
 
-    The decorated view must return a tuple (value, min, max).  The value
-    parameter represents the current value.  The min and max parameters
-    represent the minimum and maximum value respectively.  They are
-    either a value, or a tuple (value, text).  If used, the text
-    parameter will be displayed next to the minimum or maximum value.
+    The decorated view must return a tuple `(value, min, max)`.  The
+    `value` parameter represents the current value.  The `min` and `max`
+    parameters represent the minimum and maximum value respectively.
+    They are either a value, or a tuple `(value, text)`.  If used, the
+    `text` parameter will be displayed next to the minimum or maximum
+    value.
     """
 
     def _convert_view_result(self, result):
@@ -241,7 +243,7 @@ def _is_api_key_correct(request):
     auth = request.META.get('HTTP_AUTHORIZATION', '').split()
     if len(auth) == 2:
         if auth[0].lower() == 'basic':
-            request_key = base64.b64decode(auth[1])
+            request_key = base64.b64decode(auth[1]).split(':')[0]
             return request_key == api_key
     return False
 
