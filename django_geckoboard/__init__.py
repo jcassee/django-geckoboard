@@ -6,10 +6,11 @@ django-geckoboard
 Geckoboard_ is a hosted, real-time status board serving up indicators
 from web analytics, CRM, support, infrastructure, project management,
 sales, etc.  It can be connected to virtually any source of quantitative
-data.  This Django application provides view decorators to help create
+data.  This Django_ application provides view decorators to help create
 custom widgets.
 
 .. _Geckoboard: http://www.geckoboard.com/
+.. _Django: http://www.djangoproject.com/
 
 
 Installation
@@ -20,8 +21,8 @@ package somewhere on the Python path.  You do not need to add it to the
 ``INSTALLED_APPS`` list.
 
 
-Configuration
-=============
+Limiting access
+===============
 
 If you want to protect the data you send to Geckoboard from access by
 others, you can use an API key shared by Geckoboard and your widget
@@ -29,7 +30,6 @@ views.  Set ``GECKOBOARD_API_KEY`` in the project ``settings.py`` file::
 
     GECKOBOARD_API_KEY = 'XXXXXXXXX'
 
-Provide the API key to the custom widget configuration in Geckoboard.
 If you do not set an API key, anyone will be able to view the data by
 visiting the widget URL.
 
@@ -65,46 +65,46 @@ Then create a view using one of the following decorators from the
 ``django_geckoboard.decorators`` module.
 
 
-``number``
-----------
+``number_widget``
+-----------------
 
 Render a *Number & Secondary Stat* widget.
 
-The decorated view must return either a single value, or a list or tuple
-with one or two values.  The first (or only) value represents the
-current value, the second value represents the previous value.  For
-example, to render a widget that shows the number of active users and
-the difference from last week::
+The decorated view must return a tuple *(current, [previous])*, where
+the *current* parameter is the current value and optional *previous*
+parameter is the previous value of the measured quantity.  For example,
+to render a widget that shows the number of users and the difference
+from last week::
 
-    from django_geckoboard import decorators as geckoboard
+    from django_geckoboard.decorators import number_widget
     from datetime import datetime, timedelta
     from django.contrib.auth.models import User
 
-    @geckoboard.number
+    @number_widget
     def user_count(request):
         last_week = datetime.now() - timedelta(weeks=1)
-        users = User.objects.filter(is_active=True)
+        users = User.objects
         last_week_users = users.filter(date_joined__lt=last_week)
         return (users.count(), last_week_users.count())
 
 
-``rag``
--------
+``rag_widget``
+--------------
 
 Render a *RAG Column & Numbers* or *RAG Numbers* widget.
 
-The decorated view must return a tuple or list with three values, or
-three tuples (value, text).  The values represent numbers shown in red,
-amber and green respectively.  The text parameter is optional and will
-be displayed next to the value in the dashboard.  For example, to render
-a widget that shows the number of comments that were approved or deleted
-by moderators in the last 24 hours::
+The decorated view must return a tuple with three tuples *(value,
+[text])*.  The *value* parameters are the numbers shown in red, amber
+and green (in that order).  The optional *text* parameters will be
+displayed next to the respective values in the dashboard.  For example,
+to render a widget that shows the number of comments that were approved
+or deleted by moderators in the last 24 hours::
 
-    from django_geckoboard import decorators as geckoboard
+    from django_geckoboard.decorators import rag_widget
     from datetime import datetime, timedelta
     from django.contrib.comments.models import Comment, CommentFlag
 
-    @geckoboard.rag
+    @rag_widget
     def comments(request):
         start_time = datetime.now() - timedelta(hours=24)
         comments = Comment.objects.filter(submit_date__gt=start_time)
@@ -121,26 +121,29 @@ by moderators in the last 24 hours::
         )
 
 
-``text``
---------
+``text_widget``
+---------------
 
 Render a *Text* widget.
 
-The decorated view must return either a string, a list or tuple of
-strings, or a list or tuple of tuples (string, type).  The type
-parameter tells Geckoboard how to display the text.  Use ``TEXT_INFO``
-for informational messages, ``TEXT_WARN`` for for warnings and
-``TEXT_NONE`` for plain text (the default).  For example, to render a
-widget showing the latest Geckoboard twitter updates::
+The decorated view must return a list of tuples *(message, [type])*.
+The *message* parameters are strings that will be shown in the widget.
+The *type* parameters are optional and tell Geckoboard how to annotate
+the messages.  Use ``TEXT_INFO`` for informational messages,
+``TEXT_WARN`` for for warnings and ``TEXT_NONE`` for plain text (the
+default).  For example, to render a widget showing the latest
+Geckoboard twitter updates, using Mike Verdone's `Twitter library`_::
 
-    from django_geckoboard import decorators as geckoboard
+    from django_geckoboard.decorators import text_widget, TEXT_NONE
     import twitter
 
-    @geckoboard.text
+    @text_widget
     def twitter_status(request):
         twitter = twitter.Api()
         updates = twitter.GetUserTimeline('geckoboard')
-        return [(u.text, geckoboard.TEXT_NONE) for u in updates]
+        return [(u.text, TEXT_NONE) for u in updates]
+
+.. _`Twitter library`: http://pypi.python.org/pypi/twitter
 
 
 ``pie_chart``
@@ -148,15 +151,15 @@ widget showing the latest Geckoboard twitter updates::
 
 Render a *Pie chart* widget.
 
-The decorated view must return a list or tuple of tuples (value, label,
-color).  The color parameter is a string ``'RRGGBB[TT]'`` representing
-red, green, blue and optionally transparency.  For example, to render a
-widget showing the number of normal, staff and superusers::
+The decorated view must return an iterable over tuples *(value, label,
+[color])*.  The optional *color* parameter is a string ``'RRGGBB[TT]'``
+representing red, green, blue and optionally transparency.  For example,
+to render a widget showing the number of normal, staff and superusers::
 
-    from django_geckoboard import decorators as geckoboard
+    from django_geckoboard.decorators import pie_chart
     from django.contrib.auth.models import User
 
-    @geckoboard.pie_chart
+    @pie_chart
     def user_types(request):
         users = User.objects.filter(is_active=True)
         total_count = users.count()
@@ -176,21 +179,21 @@ widget showing the number of normal, staff and superusers::
 
 Render a *Line chart* widget.
 
-The decorated view must return a tuple (values, x_axis, y_axis, color).
-The value parameter is a tuple or list of data points.  The x-axis
-parameter is a label string, or a tuple or list of strings, that will be
-placed on the X-axis.  The y-axis parameter works similarly for the
-Y-axis.  If there are more axis labels, they are placed evenly along the
-axis.  The optional color parameter is a string ``'RRGGBB[TT]'``
-representing red, green, blue and optionally transparency.  For example,
-to render a widget showing the number of comments per day over the last
-four weeks (including today)::
+The decorated view must return a tuple *(values, x_axis, y_axis,
+[color])*.  The *values* parameter is a list of data points.  The
+*x-axis* parameter is a label string or a list of strings, that will be
+placed on the X-axis.  The *y-axis* parameter works similarly for the
+Y-axis.  If there are more than one axis label, they are placed evenly
+along the axis.  The optional *color* parameter is a string
+``'RRGGBB[TT]'`` representing red, green, blue and optionally
+transparency.  For example, to render a widget showing the number of
+comments per day over the last four weeks (including today)::
 
-    from django_geckoboard import decorators as geckoboard
+    from django_geckoboard.decorators import line_chart
     from datetime import date, timedelta
     from django.contrib.comments.models import Comment
 
-    @geckoboard.line_chart
+    @line_chart
     def comment_trend(request):
         since = date.today() - timedelta(days=29)
         days = dict((since + timedelta(days=d), 0)
@@ -210,19 +213,19 @@ four weeks (including today)::
 
 Render a *Geck-O-Meter* widget.
 
-The decorated view must return a tuple (value, min, max).  The value
-parameter represents the current value.  The min and max parameters
+The decorated view must return a tuple *(value, min, max)*.  The *value*
+parameter represents the current value.  The *min* and *max* parameters
 represent the minimum and maximum value respectively.  They are either a
-value, or a tuple (value, text).  If used, the text parameter will be
-displayed next to the minimum or maximum value.  For example, to render
-a widget showing the number of users that have logged in in the last 24
-hours::
+value, or a tuple *(value, text)*.  If used, the *text* parameter will
+be displayed next to the minimum or maximum value.  For example, to
+render a widget showing the number of users that have logged in in the
+last 24 hours::
 
-    from django_geckoboard import decorators as geckoboard
+    from django_geckoboard.decorators import geck_o_meter
     from datetime import datetime, timedelta
     from django.contrib.auth.models import User
 
-    @geckoboard.geck_o_meter
+    @geck_o_meter
     def login_count(request):
         since = datetime.now() - timedelta(hours=24)
         users = User.objects.filter(is_active=True)
@@ -236,6 +239,6 @@ hours::
 
 __author__ = "Joost Cassee"
 __email__ = "joost@cassee.net"
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 __copyright__ = "Copyright (C) 2011 Joost Cassee"
 __license__ = "MIT License"

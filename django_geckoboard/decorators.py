@@ -56,27 +56,28 @@ class NumberWidgetDecorator(WidgetDecorator):
     """
     Geckoboard number widget decorator.
 
-    The decorated view must return either a single value, or a list or
-    tuple with one or two values.  The first (or only) value represents
-    the current value, the second value represents the previous value.
+    The decorated view must return a tuple `(current, [previous])`, where
+    `current` is the current value and `previous` is the previous value
+    of the measured quantity.
     """
 
     def _convert_view_result(self, result):
         if not isinstance(result, (tuple, list)):
             result = [result]
-        return {'item': [{'value': v} for v in result]}
+        return {'item': [{'value': v} for v in result if v is not None]}
 
-number = NumberWidgetDecorator()
+number_widget = NumberWidgetDecorator()
 
 
 class RAGWidgetDecorator(WidgetDecorator):
     """
     Geckoboard red-amber-green widget decorator.
 
-    The decorated view must return a tuple or list with three values,
-    or three tuples (value, text).  The values represent numbers shown
-    in red, amber and green respectively.  The text parameter is
-    optional and will be displayed next to the value in the dashboard.
+    The decorated view must return a tuple with three tuples `(value,
+    [text])`.  The `value` parameters are the numbers shown in red,
+    amber and green (in that order).  The `text` parameters are optional
+    and will be displayed next to the respective values in the
+    dashboard.
     """
 
     def _convert_view_result(self, result):
@@ -94,17 +95,19 @@ class RAGWidgetDecorator(WidgetDecorator):
             items.append(item)
         return {'item': items}
 
-rag = RAGWidgetDecorator()
+rag_widget = RAGWidgetDecorator()
 
 
 class TextWidgetDecorator(WidgetDecorator):
     """
     Geckoboard text widget decorator.
 
-    The decorated view must return a list or tuple of strings, or tuples
-    (string, type).  The type parameter tells Geckoboard how to display
-    the text.  Use TEXT_INFO for informational messages, TEXT_WARN for
-    warnings and TEXT_NONE for plain text (the default).
+    The decorated view must return a list of tuples *(message, [type])*.
+    The *message* parameters are strings that will be shown in the
+    widget.  The *type* parameters are optional and tell Geckoboard how
+    to annotate the messages.  Use ``TEXT_INFO`` for informational
+    messages, ``TEXT_WARN`` for for warnings and ``TEXT_NONE`` for plain
+    text (the default).
     """
 
     def _convert_view_result(self, result):
@@ -116,23 +119,23 @@ class TextWidgetDecorator(WidgetDecorator):
                 elem = [elem]
             item = SortedDict()
             item['text'] = elem[0]
-            if len(elem) > 1:
+            if len(elem) > 1 and elem[1] is not None:
                 item['type'] = elem[1]
             else:
                 item['type'] = TEXT_NONE
             items.append(item)
         return {'item': items}
 
-text = TextWidgetDecorator()
+text_widget = TextWidgetDecorator()
 
 
 class PieChartWidgetDecorator(WidgetDecorator):
     """
     Geckoboard pie chart widget decorator.
 
-    The decorated view must return a list or tuple of tuples
-    (value, label, color).  The color parameter is a string 'RRGGBB[TT]'
-    representing red, green, blue and optionally transparency.
+    The decorated view must return a list of tuples `(value, label,
+    color)`.  The color parameter is a string 'RRGGBB[TT]' representing
+    red, green, blue and optionally transparency.
     """
 
     def _convert_view_result(self, result):
