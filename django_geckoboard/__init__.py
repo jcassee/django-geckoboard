@@ -18,7 +18,7 @@ Installation
 
 To install django-geckoboard, simply place the ``django_geckoboard``
 package somewhere on the Python path.  You do not need to add it to the
-``INSTALLED_APPS`` list.
+``INSTALLED_APPS`` list, unless you want to run the tests.
 
 
 Limiting access
@@ -34,18 +34,44 @@ If you do not set an API key, anyone will be able to view the data by
 visiting the widget URL.
 
 
-Creating custom widgets and charts
-==================================
+Creating custom widgets
+=======================
 
 The available custom widgets are described in the Geckoboard support
 section, under `Geckoboard API`_.  From the perspective of a Django
 project, a custom widget is just a view.  The django-geckoboard
 application provides view decorators that render the correct response
-for the different widgets.  When you create a custom widget in
-Geckoboard, enter the following information:
+for the different widgets.
+
+Let's say you want to add a widget to your dashboard that shows the
+number of number of comments posted today.  First create a view, using a
+django-geckoboard decorator::
+
+    from datetime import date, time, datetime
+    from django.contrib.comments.models import Comment
+    from django_geckoboard.decorators import number_widget
+
+    @number_widget
+    def comment_count(request):
+        midnight = datetime.combine(date.today(), time.min)
+        return Comment.objects.filter(submit_date__gte=midnight).count()
+
+Use a URLconf module to map a URL to the view::
+
+    from django.conf.urls.defaults import *
+
+    urlpatterns = patterns('YOUR_VIEW_MODULE',
+        ...
+        (r'^geckoboard/comment_count/$', 'comment_count'),
+    )
+
+This is all the Django code you need to display the comment count on
+your dashboard. When you create a custom widget in Geckoboard, enter the
+following information:
 
 URL data feed
-    The view URL.
+    The view URL.  In the example above this would be something like
+    ``http://HOSTNAME/geckoboard/comment_count/``.
 
 API key
     The content of the ``GECKOBOARD_API_KEY`` setting, if you have set
@@ -61,8 +87,9 @@ Feed format
 Request type
     Either *GET* or *POST*.  The view decorators accept both.
 
-Then create a view using one of the following decorators from the
-``django_geckoboard.decorators`` module.
+
+The following decorators are available from the
+``django_geckoboard.decorators`` module:
 
 
 ``number_widget``
@@ -72,9 +99,10 @@ Render a *Number & Secondary Stat* widget.
 
 The decorated view must return a tuple *(current, [previous])*, where
 the *current* parameter is the current value and optional *previous*
-parameter is the previous value of the measured quantity.  For example,
-to render a widget that shows the number of users and the difference
-from last week::
+parameter is the previous value of the measured quantity.  If there is
+only one parameter you do not need to return it in a tuple.  For
+example, to render a widget that shows the number of users and the
+difference from last week::
 
     from django_geckoboard.decorators import number_widget
     from datetime import datetime, timedelta
@@ -131,8 +159,10 @@ The *message* parameters are strings that will be shown in the widget.
 The *type* parameters are optional and tell Geckoboard how to annotate
 the messages.  Use ``TEXT_INFO`` for informational messages,
 ``TEXT_WARN`` for for warnings and ``TEXT_NONE`` for plain text (the
-default).  For example, to render a widget showing the latest
-Geckoboard twitter updates, using Mike Verdone's `Twitter library`_::
+default).  If there is only one plain message, you can just return it
+without enclosing it in a list and tuple.  For example, to render a
+widget showing the latest Geckoboard twitter updates, using Mike
+Verdone's `Twitter library`_::
 
     from django_geckoboard.decorators import text_widget, TEXT_NONE
     import twitter
@@ -239,6 +269,6 @@ last 24 hours::
 
 __author__ = "Joost Cassee"
 __email__ = "joost@cassee.net"
-__version__ = "0.2.1"
+__version__ = "1.0.0"
 __copyright__ = "Copyright (C) 2011 Joost Cassee"
 __license__ = "MIT License"
