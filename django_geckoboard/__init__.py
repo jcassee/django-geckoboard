@@ -56,7 +56,7 @@ django-geckoboard decorator::
         midnight = datetime.combine(date.today(), time.min)
         return Comment.objects.filter(submit_date__gte=midnight).count()
 
-Use a URLconf module to map a URL to the view::
+Then use a URLconf module to map a URL to the view::
 
     from django.conf.urls.defaults import *
 

@@ -1,6 +1,10 @@
 Changelog
 =========
 
+Version 1.0.0
+-------------
+* No changes from 0.2.1.
+
 Version 0.2.1
 -------------
 * Fixed API key detection.
