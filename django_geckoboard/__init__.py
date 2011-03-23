@@ -302,6 +302,6 @@ vs. anonymous users::
 
 __author__ = "Joost Cassee"
 __email__ = "joost@cassee.net"
-__version__ = "1.0.0"
-__copyright__ = "Copyright (C) 2011 Joost Cassee"
+__version__ = "1.1.0"
+__copyright__ = "Copyright (C) 2011 Joost Cassee and others"
 __license__ = "MIT License"
