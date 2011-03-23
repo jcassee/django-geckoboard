@@ -23,10 +23,12 @@ posting detailed bug reports, proposing new features or other analytics
 services to support, or suggesting documentation improvements, please
 use the `issue tracker`_.  If you want to get your hands dirty, great!
 Clone the repository, make changes and send a pull request.  Please do
-create an issue to discuss your plans.
+create an issue to discuss your plans.  People who have contributed:
 
-Copyright (C) 2011 Joost Cassee <joost@cassee.net>.  This software is
-licensed under the MIT License (see LICENSE.txt).
+* Simon de Haan
+
+Copyright (C) 2011 Joost Cassee <joost@cassee.net> and others.  This
+software is licensed under the MIT License (see LICENSE.txt).
 
 Thanks go to Geckoboard for their support, and to GitHub for hosting the
 project source code and issue tracker.

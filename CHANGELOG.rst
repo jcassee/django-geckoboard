@@ -1,6 +1,10 @@
 Changelog
 =========
 
+Development
+-----------
+* Added *funnel* widget decorator contributed by Simon de Haan.
+
 Version 1.0.0
 -------------
 * No changes from 0.2.1.
