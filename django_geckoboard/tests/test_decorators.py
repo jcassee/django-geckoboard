@@ -7,7 +7,7 @@ from django.utils.datastructures import SortedDict
 
 from django_geckoboard.decorators import widget, number_widget, rag_widget, \
         text_widget, pie_chart, line_chart, geck_o_meter, TEXT_NONE, \
-        TEXT_INFO, TEXT_WARN
+        TEXT_INFO, TEXT_WARN, funnel
 from django_geckoboard.tests.utils import TestCase
 import base64
 
@@ -312,3 +312,40 @@ class GeckOMeterDecoratorTestCase(TestCase):
         resp = widget(self.request)
         self.assertEqual('{"item": 2, "max": {"value": 3, "text": "max"}, '
                 '"min": {"value": 1, "text": "min"}}', resp.content)
+            
+        
+class FunnelDecoratorTestCase(TestCase):
+    """
+    Tests for the ``funnel`` decorator
+    """
+    
+    def setUp(self):
+        super(FunnelDecoratorTestCase, self).setUp()
+        self.settings_manager.delete('GECKOBOARD_API_KEY')
+        self.request = HttpRequest()
+        self.request.POST['format'] = '2'
+        self.funnel_data = {
+            "items":[
+                (50, 'step 2'),
+                (100, 'step 1'),
+            ], 
+            "type": "reverse", 
+            "percentage": "hide"
+        }
+    
+    def test_funnel(self):
+        widget = funnel(lambda r: self.funnel_data)
+        resp = widget(self.request)
+        self.assertEqual('{"item": [{"value": 50, "label": "step 2"}, '
+                    '{"value": 100, "label": "step 1"}], "type": "reverse", "percentage": "hide"}', resp.content)
+    
+    def test_funnel_sorting(self):
+        sortable_data = self.funnel_data
+        sortable_data.update({
+            'sort': True
+        })
+        widget = funnel(lambda r: sortable_data)
+        resp = widget(self.request)
+        self.assertEqual('{"item": [{"value": 100, "label": "step 1"}, '
+                    '{"value": 50, "label": "step 2"}], "type": "reverse", "percentage": "hide"}', resp.content)
+        

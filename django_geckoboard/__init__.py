@@ -264,6 +264,36 @@ last 24 hours::
         return (logged_in_count, 0, total_count)
 
 
+``funnel`
+---------
+
+Render a *Funnel* widget.
+
+The decorated view must return a dictionary with at least an 'items' key.
+To render a funnel showing the breakdown of authenticated users vs anonymous
+users::
+
+    from django_geckoboard.decorators import funnel
+    from django.contrib.auth.models import User
+    
+    @funnel
+    def user_breakdown(request):
+        all_users = User.objects
+        active_users =all_users.filter(is_active=True)
+        staff_users = all_users.filter(is_staff=True)
+        super_users = all_users.filter(is_superuser=True)
+        return {
+            "items": [
+                (all_users.count(), 'All users'),
+                (active_users.count(), 'Active users'),
+                (staff_users.count(), 'Staff users'),
+                (super_users.count(), 'Super users'),
+            ],
+            "type": "standard", # default, 'reverse' changes direction of the colors.
+            "percentage": "show", # default, 'hide' hides the percentage values.
+            "sort": False # default, `True` orders the values descending.
+        }
+    
 .. _`Geckoboard API`: http://geckoboard.zendesk.com/forums/207979-geckoboard-api
 """
 
