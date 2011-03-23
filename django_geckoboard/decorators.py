@@ -235,6 +235,19 @@ class GeckOMeterWidgetDecorator(WidgetDecorator):
 geck_o_meter = GeckOMeterWidgetDecorator()
 
 class FunnelWidgetDecorator(WidgetDecorator):
+    """
+    Geckoboard Funnel decorator
+    
+    The decorated view must return a dictionary with at least an `items`
+    entry: `{'items': [(100, '100 %'), (50, '50 %')]}`.
+    
+    Optional keys are:
+    
+        type: 'standard' (default) or 'reverse'. Determines the order of the colours.
+        percentage: 'show' (default) or 'hide'. Determines whether or not the percentage value is shown.
+        sort: `False` (default) or `True`. Sort the entries by value or not.
+    
+    """
     def _convert_view_result(self, result):
         data = SortedDict()
         items = result.get('items', [])
