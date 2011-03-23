@@ -234,6 +234,16 @@ class GeckOMeterWidgetDecorator(WidgetDecorator):
 
 geck_o_meter = GeckOMeterWidgetDecorator()
 
+class FunnelWidgetDecorator(WidgetDecorator):
+    def _convert_view_result(self, result):
+        data = SortedDict()
+        data["item"] = [{"value": item[0], "label": item[1]} for item in result.get('items', [])]
+        data["type"] = result.get('type', 'standard')
+        data["percentage"] = result.get('percentage','show')
+        return data
+    
+
+funnel = FunnelWidgetDecorator()
 
 def _is_api_key_correct(request):
     """Return whether the Geckoboard API key on the request is correct."""
