@@ -324,9 +324,28 @@ class FunnelDecoratorTestCase(TestCase):
         self.settings_manager.delete('GECKOBOARD_API_KEY')
         self.request = HttpRequest()
         self.request.POST['format'] = '2'
+        self.funnel_data = {
+            "items":[
+                (50, 'step 2'),
+                (100, 'step 1'),
+            ], 
+            "type": "reverse", 
+            "percentage": "hide"
+        }
     
     def test_funnel(self):
-        widget = funnel(lambda r: {"items":[(100, 'step 1'),(50, 'step 2')], "type": "reverse", "percentage": "hide"})
+        widget = funnel(lambda r: self.funnel_data)
+        resp = widget(self.request)
+        self.assertEqual('{"item": [{"value": 50, "label": "step 2"}, '
+                    '{"value": 100, "label": "step 1"}], "type": "reverse", "percentage": "hide"}', resp.content)
+    
+    def test_funnel_sorting(self):
+        sortable_data = self.funnel_data
+        sortable_data.update({
+            'sort': True
+        })
+        widget = funnel(lambda r: sortable_data)
         resp = widget(self.request)
         self.assertEqual('{"item": [{"value": 100, "label": "step 1"}, '
                     '{"value": 50, "label": "step 2"}], "type": "reverse", "percentage": "hide"}', resp.content)
+        

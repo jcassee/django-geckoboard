@@ -237,7 +237,13 @@ geck_o_meter = GeckOMeterWidgetDecorator()
 class FunnelWidgetDecorator(WidgetDecorator):
     def _convert_view_result(self, result):
         data = SortedDict()
-        data["item"] = [{"value": item[0], "label": item[1]} for item in result.get('items', [])]
+        items = result.get('items', [])
+        
+        # sort the items in order if so desired
+        if result.get('sort'):
+            items.sort(reverse=True)
+        
+        data["item"] = [dict(zip(("value","label"), item)) for item in items]
         data["type"] = result.get('type', 'standard')
         data["percentage"] = result.get('percentage','show')
         return data
