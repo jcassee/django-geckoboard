@@ -124,9 +124,10 @@ Render a *RAG Column & Numbers* or *RAG Numbers* widget.
 The decorated view must return a tuple with three tuples *(value,
 [text])*.  The *value* parameters are the numbers shown in red, amber
 and green (in that order).  The optional *text* parameters will be
-displayed next to the respective values in the dashboard.  For example,
-to render a widget that shows the number of comments that were approved
-or deleted by moderators in the last 24 hours::
+displayed next to the respective values in the dashboard.
+
+For example, to render a widget that shows the number of comments that
+were approved or deleted by moderators in the last 24 hours::
 
     from django_geckoboard.decorators import rag_widget
     from datetime import datetime, timedelta
@@ -160,9 +161,10 @@ The *type* parameters are optional and tell Geckoboard how to annotate
 the messages.  Use ``TEXT_INFO`` for informational messages,
 ``TEXT_WARN`` for for warnings and ``TEXT_NONE`` for plain text (the
 default).  If there is only one plain message, you can just return it
-without enclosing it in a list and tuple.  For example, to render a
-widget showing the latest Geckoboard twitter updates, using Mike
-Verdone's `Twitter library`_::
+without enclosing it in a list and tuple.
+
+For example, to render a widget showing the latest Geckoboard twitter
+updates, using Mike Verdone's `Twitter library`_::
 
     from django_geckoboard.decorators import text_widget, TEXT_NONE
     import twitter
@@ -183,8 +185,10 @@ Render a *Pie chart* widget.
 
 The decorated view must return an iterable over tuples *(value, label,
 [color])*.  The optional *color* parameter is a string ``'RRGGBB[TT]'``
-representing red, green, blue and optionally transparency.  For example,
-to render a widget showing the number of normal, staff and superusers::
+representing red, green, blue and optionally transparency.
+
+For example, to render a widget showing the number of normal, staff and
+superusers::
 
     from django_geckoboard.decorators import pie_chart
     from django.contrib.auth.models import User
@@ -216,8 +220,10 @@ placed on the X-axis.  The *y-axis* parameter works similarly for the
 Y-axis.  If there are more than one axis label, they are placed evenly
 along the axis.  The optional *color* parameter is a string
 ``'RRGGBB[TT]'`` representing red, green, blue and optionally
-transparency.  For example, to render a widget showing the number of
-comments per day over the last four weeks (including today)::
+transparency.
+
+For example, to render a widget showing the number of comments per day
+over the last four weeks (including today)::
 
     from django_geckoboard.decorators import line_chart
     from datetime import date, timedelta
@@ -247,9 +253,10 @@ The decorated view must return a tuple *(value, min, max)*.  The *value*
 parameter represents the current value.  The *min* and *max* parameters
 represent the minimum and maximum value respectively.  They are either a
 value, or a tuple *(value, text)*.  If used, the *text* parameter will
-be displayed next to the minimum or maximum value.  For example, to
-render a widget showing the number of users that have logged in in the
-last 24 hours::
+be displayed next to the minimum or maximum value.
+
+For example, to render a widget showing the number of users that have
+logged in in the last 24 hours::
 
     from django_geckoboard.decorators import geck_o_meter
     from datetime import datetime, timedelta
