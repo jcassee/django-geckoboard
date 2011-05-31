@@ -3,6 +3,7 @@ Geckoboard decorators.
 """
 
 import base64
+from types import ListType, TupleType
 from xml.dom.minidom import Document
 
 try:
@@ -267,6 +268,140 @@ class FunnelWidgetDecorator(WidgetDecorator):
 
 funnel = FunnelWidgetDecorator()
 
+class BulletWidgetDecorator(WidgetDecorator):
+    """
+    See http://support.geckoboard.com/entries/274940-custom-chart-widget-type-definitions 
+    for more information.
+
+    The decorated method must return a dictionary containing these keys:
+
+    Required keys:    
+    label:          Main label, eg. "Revenue 2011 YTD".
+    axis_points:    Points on the axis, eg. [0, 200, 400, 600, 800, 1000].
+    current:        Current value range, eg. 500 or [100, 500]. A singleton 
+                    500 is internally converted to [0, 500].
+    comparitive:    Comparitive value, eg. 600.
+
+    Optional keys:
+    orientation:    One of 'horizontal' or 'vertical'. Defaults to horizontal.
+    sublabel:       Appears below main label.
+    red:            Red start and end, eg. [0,100]. Defaults are calculated 
+                    from axis_points.
+    amber:          Amber start and end, eg. [0,100]. Defaults are calculated 
+                    from axis_points.
+    green:          Green start and end, eg. [0,100]. Defaults are calculated 
+                    from axis_points.
+    projected:      Projected value range, eg. 900 or [100, 900]. A singleton 
+                    900 is internally converted to [0, 900].
+                    
+    auto_scale:     If true then values will be scaled down if they  
+                    do not fit into Geckoboard's UI, eg. a value of 1100 
+                    is represented as 1.1. If scaling takes place the sublabel 
+                    is suffixed with that information. Default is true.
+    """
+
+    def _convert_view_result(self, result):
+        # Check required keys. We do not do type checking since this level of 
+        # competence is assumed.
+        for key in ('label', 'axis_points', 'current', 'comparitive'):
+            if not result.has_key(key):
+                raise RuntimeError, "Key %s is required" % key
+                
+        # Handle singleton current and projected
+        current = result['current']
+        projected = result.get('projected', None)
+        if not isinstance(current, (ListType, TupleType)):
+            current = [0, current]
+        if (projected is not None) and not isinstance(projected, (ListType, TupleType)):
+            projected = [0, projected]
+
+        # If red, amber and green are not *all* supplied calculate defaults
+        axis_points = result['axis_points']
+        red = result.get('red', None)
+        amber = result.get('amber', None)
+        green = result.get('green', None)
+        if (red is None) or (amber is None) or (green is None):
+            if axis_points:
+                max_point = max(axis_points)
+                min_point = min(axis_points)
+                third = (max_point - min_point) / 3
+                red = (min_point, min_point + third - 1)
+                amber = (min_point + third, max_point - third - 1)
+                green = (max_point - third, max_point)
+            else:
+                red = amber = green = (0, 0)
+
+        # Scan axis points for largest value and scale to avoid overflow in
+        # Geckoboard's UI.
+        auto_scale = result.get('auto_scale', True)
+        if auto_scale and axis_points:
+            scale_label_map = {1000000000:'billions', 1000000:'millions', 1000:'thousands'}
+            scale = 1
+            value = max(axis_points)
+            for n in (1000000000, 1000000, 1000):
+                if value >= n:
+                    scale = n
+                    break
+
+            # Little fixedpoint helper. 
+            # todo: use a fixedpoint library
+            def scaler(value, scale):
+                return float('%.2f' % (value*1.0 / scale))
+
+            # Apply scale to all values
+            if scale > 1:
+                axis_points = [scaler(v, scale) for v in axis_points]
+                current = (scaler(current[0], scale), scaler(current[1], scale))
+                if projected is not None:
+                    projected = (scaler(projected[0], scale), scaler(projected[1], scale))
+                red = (scaler(red[0], scale), scaler(red[1], scale))
+                amber = (scaler(amber[0], scale), scaler(amber[1], scale))
+                green = (scaler(green[0], scale), scaler(green[1], scale))
+                result['comparitive'] = scaler(result['comparitive'], scale)
+
+                # Suffix sublabel
+                sublabel = result.get('sublabel', '')
+                if sublabel:
+                    result['sublabel'] = '%s (%s)' % (sublabel, scale_label_map[scale])
+                else:
+                    result['sublabel'] = scale_label_map[scale].capitalize()
+
+        # Assemble structure. Make use of SortedDicts in case Geckoboard's 
+        # XML processor is wonky. SortedDicts also make writing unit tests 
+        # easier.
+        data = SortedDict()
+        data['orientation'] = result.get('orientation', 'horizontal')
+        data['item'] = SortedDict()
+        # Alias to try and keep code readable
+        item = data['item']
+        item['label'] = result['label']
+        if result.has_key('sublabel'):
+            item['sublabel'] = result['sublabel']
+        item['axis'] = SortedDict()
+        item['axis']['point'] = axis_points
+        item['range'] = SortedDict()
+        item['range']['red'] = SortedDict()
+        item['range']['red']['start'] = red[0]
+        item['range']['red']['end'] = red[1]
+        item['range']['amber'] = SortedDict()
+        item['range']['amber']['start'] = amber[0]
+        item['range']['amber']['end'] = amber[1]
+        item['range']['green'] = SortedDict()
+        item['range']['green']['start'] = green[0]
+        item['range']['green']['end'] = green[1]
+        item['measure'] = SortedDict()
+        item['measure']['current'] = SortedDict()
+        item['measure']['current']['start'] = current[0]
+        item['measure']['current']['end'] = current[1]
+        if projected is not None:
+            item['measure']['projected'] = SortedDict()
+            item['measure']['projected']['start'] = projected[0]
+            item['measure']['projected']['end'] = projected[1]
+        item['comparitive'] = SortedDict()
+        item['comparitive'] = result['comparitive']
+        return data
+
+bullet = BulletWidgetDecorator()
 
 def _is_api_key_correct(request):
     """Return whether the Geckoboard API key on the request is correct."""

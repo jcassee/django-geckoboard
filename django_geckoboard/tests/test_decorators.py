@@ -2,12 +2,13 @@
 Tests for the Geckoboard decorators.
 """
 
+import simplejson
 from django.http import HttpRequest, HttpResponseForbidden
 from django.utils.datastructures import SortedDict
 
 from django_geckoboard.decorators import widget, number_widget, rag_widget, \
         text_widget, pie_chart, line_chart, geck_o_meter, TEXT_NONE, \
-        TEXT_INFO, TEXT_WARN, funnel
+        TEXT_INFO, TEXT_WARN, funnel, bullet
 from django_geckoboard.tests.utils import TestCase
 import base64
 
@@ -350,3 +351,44 @@ class FunnelDecoratorTestCase(TestCase):
         self.assertEqual('{"item": [{"value": 100, "label": "step 1"}, '
                     '{"value": 50, "label": "step 2"}], "type": "reverse", '
                     '"percentage": "hide"}', resp.content)
+
+
+class BulletDecoratorTestCase(TestCase):
+    """
+    Tests for the ``bullet`` decorator
+    """
+
+    def setUp(self):
+        super(BulletDecoratorTestCase, self).setUp()
+        self.settings_manager.delete('GECKOBOARD_API_KEY')
+        self.request = HttpRequest()
+        self.request.POST['format'] = '2'
+        self.bullet_data_minimal = {
+            'label':'Some label',
+            'axis_points':[0, 200, 400, 600, 800, 1000],
+            'current':500,
+            'comparitive':600,
+            'auto_scale':False,
+        }
+
+    def test_bullet_minimal(self):
+        """Minimal set of parameters. Some values are cimputed by decorator."""
+        widget = bullet(lambda r: self.bullet_data_minimal)
+        resp = widget(self.request)
+        # Parse
+        data = simplejson.loads(resp.content) 
+        # Alias for readability
+        item = data['item']
+        # Tests
+        self.assertEqual(data['orientation'], 'horizontal')
+        self.assertEqual(item['label'], "Some label")
+        self.assertEqual(item['axis']['point'], [0, 200, 400, 600, 800, 1000])
+        self.assertEqual(item['measure']['current']['start'], 0)
+        self.assertEqual(item['measure']['current']['end'], 500)
+        self.assertEqual(item['comparitive'], 600)
+        self.assertEqual(item['range']['red']['start'], 0)
+        self.assertEqual(item['range']['red']['end'], 332)
+        self.assertEqual(item['range']['amber']['start'], 333)
+        self.assertEqual(item['range']['amber']['end'], 666)
+        self.assertEqual(item['range']['green']['start'], 667)
+        self.assertEqual(item['range']['green']['end'], 1000)
