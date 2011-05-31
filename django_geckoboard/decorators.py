@@ -172,7 +172,7 @@ class LineChartWidgetDecorator(WidgetDecorator):
 
     def _convert_view_result(self, result):
         data = SortedDict()
-        data['item'] = result[0]
+        data['item'] = list(result[0])
         data['settings'] = SortedDict()
 
         if len(result) > 1:
