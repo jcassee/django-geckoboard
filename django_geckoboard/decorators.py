@@ -366,39 +366,28 @@ class BulletWidgetDecorator(WidgetDecorator):
                 else:
                     result['sublabel'] = scale_label_map[scale].capitalize()
 
-        # Assemble structure. Make use of SortedDicts in case Geckoboard's 
-        # XML processor is wonky. SortedDicts also make writing unit tests 
-        # easier.
-        data = SortedDict()
-        data['orientation'] = result.get('orientation', 'horizontal')
-        data['item'] = SortedDict()
-        # Alias to try and keep code readable
-        item = data['item']
-        item['label'] = result['label']
+        # Assemble structure
+        data = dict(
+            orientation=result.get('orientation', 'horizontal'), 
+            item=dict(
+                label=result['label'],
+                axis=dict(point=axis_points),
+                range=dict(
+                    red=dict(start=red[0], end=red[1]),
+                    amber=dict(start=amber[0], end=amber[1]),
+                    green=dict(start=green[0], end=green[1])
+                ),
+                measure=dict(current=dict(start=current[0], end=current[1])),
+                comparitive=result['comparitive']
+            )
+        )
+       
+        # Add optional items
         if result.has_key('sublabel'):
-            item['sublabel'] = result['sublabel']
-        item['axis'] = SortedDict()
-        item['axis']['point'] = axis_points
-        item['range'] = SortedDict()
-        item['range']['red'] = SortedDict()
-        item['range']['red']['start'] = red[0]
-        item['range']['red']['end'] = red[1]
-        item['range']['amber'] = SortedDict()
-        item['range']['amber']['start'] = amber[0]
-        item['range']['amber']['end'] = amber[1]
-        item['range']['green'] = SortedDict()
-        item['range']['green']['start'] = green[0]
-        item['range']['green']['end'] = green[1]
-        item['measure'] = SortedDict()
-        item['measure']['current'] = SortedDict()
-        item['measure']['current']['start'] = current[0]
-        item['measure']['current']['end'] = current[1]
+            data['item']['sublabel'] = result['sublabel']
         if projected is not None:
-            item['measure']['projected'] = SortedDict()
-            item['measure']['projected']['start'] = projected[0]
-            item['measure']['projected']['end'] = projected[1]
-        item['comparitive'] = SortedDict()
-        item['comparitive'] = result['comparitive']
+            data['item']['measure']['projected'] = dict(start=projected[0], end=projected[1])
+
         return data
 
 bullet = BulletWidgetDecorator()

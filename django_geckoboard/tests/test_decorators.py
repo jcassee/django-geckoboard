@@ -372,7 +372,7 @@ class BulletDecoratorTestCase(TestCase):
         }
 
     def test_bullet_minimal(self):
-        """Minimal set of parameters. Some values are cimputed by decorator."""
+        """Minimal set of parameters. Some values are computed by the decorator."""
         widget = bullet(lambda r: self.bullet_data_minimal)
         resp = widget(self.request)
         # Parse
