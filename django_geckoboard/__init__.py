@@ -304,6 +304,33 @@ vs. anonymous users::
                                   # descending.
         }
 
+``bullet``
+----------
+
+Render a *Bullet* widget.
+
+The decorated view must return a dictionary with at least keys *label*,
+*axis_points*, *current* and *comparitive*. To render Geckoboard's own example
+at
+http://support.geckoboard.com/entries/274940-custom-chart-widget-type-definitions::
+
+    from django_geckoboard.decorators import bullet
+
+    @bullet
+    def geckoboard_bullet_example(request):
+        return = {
+            'label':'Revenue 2011 YTD',
+            'axis_points':[0, 200, 400, 600, 800, 1000],
+            'current':500,
+            'comparitive':600,
+            'sublabel':'U.S. $ in thousands',
+            'red':[0, 400],
+            'amber':[401, 700],
+            'green':[701, 1000],
+            'projected':[100, 900],
+            'auto_scale':False,
+        }
+
 .. _`Geckoboard API`: http://geckoboard.zendesk.com/forums/207979-geckoboard-api
 """
 
