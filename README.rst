@@ -26,6 +26,7 @@ Clone the repository, make changes and send a pull request.  Please do
 create an issue to discuss your plans.  People who have contributed:
 
 * Simon de Haan
+* Hedley Roos
 
 Copyright (C) 2011 Joost Cassee <joost@cassee.net> and others.  This
 software is licensed under the MIT License (see LICENSE.txt).

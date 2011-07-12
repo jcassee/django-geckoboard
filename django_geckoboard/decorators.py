@@ -268,51 +268,53 @@ class FunnelWidgetDecorator(WidgetDecorator):
 
 funnel = FunnelWidgetDecorator()
 
+
 class BulletWidgetDecorator(WidgetDecorator):
     """
-    See http://support.geckoboard.com/entries/274940-custom-chart-widget-type-definitions 
+    See http://support.geckoboard.com/entries/274940-custom-chart-widget-type-definitions
     for more information.
 
     The decorated method must return a dictionary containing these keys:
 
-    Required keys:    
+    Required keys:
     label:          Main label, eg. "Revenue 2011 YTD".
     axis_points:    Points on the axis, eg. [0, 200, 400, 600, 800, 1000].
-    current:        Current value range, eg. 500 or [100, 500]. A singleton 
+    current:        Current value range, eg. 500 or [100, 500]. A singleton
                     500 is internally converted to [0, 500].
     comparitive:    Comparitive value, eg. 600.
 
     Optional keys:
     orientation:    One of 'horizontal' or 'vertical'. Defaults to horizontal.
     sublabel:       Appears below main label.
-    red:            Red start and end, eg. [0,100]. Defaults are calculated 
+    red:            Red start and end, eg. [0,100]. Defaults are calculated
                     from axis_points.
-    amber:          Amber start and end, eg. [0,100]. Defaults are calculated 
+    amber:          Amber start and end, eg. [0,100]. Defaults are calculated
                     from axis_points.
-    green:          Green start and end, eg. [0,100]. Defaults are calculated 
+    green:          Green start and end, eg. [0,100]. Defaults are calculated
                     from axis_points.
-    projected:      Projected value range, eg. 900 or [100, 900]. A singleton 
+    projected:      Projected value range, eg. 900 or [100, 900]. A singleton
                     900 is internally converted to [0, 900].
-                    
-    auto_scale:     If true then values will be scaled down if they  
-                    do not fit into Geckoboard's UI, eg. a value of 1100 
-                    is represented as 1.1. If scaling takes place the sublabel 
+
+    auto_scale:     If true then values will be scaled down if they
+                    do not fit into Geckoboard's UI, eg. a value of 1100
+                    is represented as 1.1. If scaling takes place the sublabel
                     is suffixed with that information. Default is true.
     """
 
     def _convert_view_result(self, result):
-        # Check required keys. We do not do type checking since this level of 
+        # Check required keys. We do not do type checking since this level of
         # competence is assumed.
         for key in ('label', 'axis_points', 'current', 'comparitive'):
             if not result.has_key(key):
                 raise RuntimeError, "Key %s is required" % key
-                
+
         # Handle singleton current and projected
         current = result['current']
         projected = result.get('projected', None)
         if not isinstance(current, (ListType, TupleType)):
             current = [0, current]
-        if (projected is not None) and not isinstance(projected, (ListType, TupleType)):
+        if (projected is not None) and not isinstance(projected, (ListType,
+                TupleType)):
             projected = [0, projected]
 
         # If red, amber and green are not *all* supplied calculate defaults
@@ -335,7 +337,8 @@ class BulletWidgetDecorator(WidgetDecorator):
         # Geckoboard's UI.
         auto_scale = result.get('auto_scale', True)
         if auto_scale and axis_points:
-            scale_label_map = {1000000000:'billions', 1000000:'millions', 1000:'thousands'}
+            scale_label_map = {1000000000: 'billions', 1000000: 'millions',
+                    1000: 'thousands'}
             scale = 1
             value = max(axis_points)
             for n in (1000000000, 1000000, 1000):
@@ -343,7 +346,7 @@ class BulletWidgetDecorator(WidgetDecorator):
                     scale = n
                     break
 
-            # Little fixedpoint helper. 
+            # Little fixedpoint helper.
             # todo: use a fixedpoint library
             def scaler(value, scale):
                 return float('%.2f' % (value*1.0 / scale))
@@ -353,7 +356,8 @@ class BulletWidgetDecorator(WidgetDecorator):
                 axis_points = [scaler(v, scale) for v in axis_points]
                 current = (scaler(current[0], scale), scaler(current[1], scale))
                 if projected is not None:
-                    projected = (scaler(projected[0], scale), scaler(projected[1], scale))
+                    projected = (scaler(projected[0], scale),
+                            scaler(projected[1], scale))
                 red = (scaler(red[0], scale), scaler(red[1], scale))
                 amber = (scaler(amber[0], scale), scaler(amber[1], scale))
                 green = (scaler(green[0], scale), scaler(green[1], scale))
@@ -362,13 +366,14 @@ class BulletWidgetDecorator(WidgetDecorator):
                 # Suffix sublabel
                 sublabel = result.get('sublabel', '')
                 if sublabel:
-                    result['sublabel'] = '%s (%s)' % (sublabel, scale_label_map[scale])
+                    result['sublabel'] = '%s (%s)' % \
+                            (sublabel, scale_label_map[scale])
                 else:
                     result['sublabel'] = scale_label_map[scale].capitalize()
 
         # Assemble structure
         data = dict(
-            orientation=result.get('orientation', 'horizontal'), 
+            orientation=result.get('orientation', 'horizontal'),
             item=dict(
                 label=result['label'],
                 axis=dict(point=axis_points),
@@ -381,16 +386,18 @@ class BulletWidgetDecorator(WidgetDecorator):
                 comparitive=result['comparitive']
             )
         )
-       
+
         # Add optional items
         if result.has_key('sublabel'):
             data['item']['sublabel'] = result['sublabel']
         if projected is not None:
-            data['item']['measure']['projected'] = dict(start=projected[0], end=projected[1])
+            data['item']['measure']['projected'] = dict(start=projected[0],
+                    end=projected[1])
 
         return data
 
 bullet = BulletWidgetDecorator()
+
 
 def _is_api_key_correct(request):
     """Return whether the Geckoboard API key on the request is correct."""

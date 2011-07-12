@@ -1,6 +1,10 @@
 Changelog
 =========
 
+Version 1.2.0
+-------------
+* Added *bullet* widget decorator contributed by Hedley Roos.
+
 Version 1.1.0
 -------------
 * Added *funnel* widget decorator contributed by Simon de Haan.

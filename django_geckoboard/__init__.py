@@ -310,7 +310,7 @@ vs. anonymous users::
 Render a *Bullet* widget.
 
 The decorated view must return a dictionary with at least keys *label*,
-*axis_points*, *current* and *comparitive*. To render Geckoboard's own example
+*axis_points*, *current* and *comparative*. To render Geckoboard's own example
 at
 http://support.geckoboard.com/entries/274940-custom-chart-widget-type-definitions::
 
@@ -319,16 +319,16 @@ http://support.geckoboard.com/entries/274940-custom-chart-widget-type-definition
     @bullet
     def geckoboard_bullet_example(request):
         return = {
-            'label':'Revenue 2011 YTD',
-            'axis_points':[0, 200, 400, 600, 800, 1000],
-            'current':500,
-            'comparitive':600,
-            'sublabel':'U.S. $ in thousands',
-            'red':[0, 400],
-            'amber':[401, 700],
-            'green':[701, 1000],
-            'projected':[100, 900],
-            'auto_scale':False,
+            'label': 'Revenue 2011 YTD',
+            'axis_points': [0, 200, 400, 600, 800, 1000],
+            'current': 500,
+            'comparative': 600,
+            'sublabel': 'U.S. $ in thousands',
+            'red': [0, 400],
+            'amber': [401, 700],
+            'green': [701, 1000],
+            'projected': [100, 900],
+            'auto_scale': False,
         }
 
 .. _`Geckoboard API`: http://geckoboard.zendesk.com/forums/207979-geckoboard-api
@@ -336,6 +336,6 @@ http://support.geckoboard.com/entries/274940-custom-chart-widget-type-definition
 
 __author__ = "Joost Cassee"
 __email__ = "joost@cassee.net"
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 __copyright__ = "Copyright (C) 2011 Joost Cassee and others"
 __license__ = "MIT License"
