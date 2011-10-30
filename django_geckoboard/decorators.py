@@ -441,7 +441,7 @@ def _build_xml(doc, parent, data):
         _build_str_xml(doc, parent, data)
 
 def _build_str_xml(doc, parent, data):
-    parent.appendChild(doc.createTextNode(str(data)))
+    parent.appendChild(doc.createTextNode(unicode(data)))
 
 def _build_list_xml(doc, parent, data):
     for item in data:
