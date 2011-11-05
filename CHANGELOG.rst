@@ -1,6 +1,10 @@
 Changelog
 =========
 
+Version 1.2.1
+-------------
+* Fix unicode handling (Éric St-Jean)
+
 Version 1.2.0
 -------------
 * Added *bullet* widget decorator contributed by Hedley Roos.
