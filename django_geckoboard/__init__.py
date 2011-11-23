@@ -234,7 +234,7 @@ over the last four weeks (including today)::
         since = date.today() - timedelta(days=29)
         days = dict((since + timedelta(days=d), 0)
                 for d in range(0, 29))
-        comments = Comment.objects.filter(submit_date=since)
+        comments = Comment.objects.filter(submit_date__gte=since)
         for comment in comments:
             days[comment.submit_date.date()] += 1
         return (
