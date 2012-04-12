@@ -281,7 +281,7 @@ class BulletWidgetDecorator(WidgetDecorator):
     axis_points:    Points on the axis, eg. [0, 200, 400, 600, 800, 1000].
     current:        Current value range, eg. 500 or [100, 500]. A singleton
                     500 is internally converted to [0, 500].
-    comparitive:    Comparitive value, eg. 600.
+    comparative:    Comparative value, eg. 600.
 
     Optional keys:
     orientation:    One of 'horizontal' or 'vertical'. Defaults to horizontal.
@@ -304,7 +304,7 @@ class BulletWidgetDecorator(WidgetDecorator):
     def _convert_view_result(self, result):
         # Check required keys. We do not do type checking since this level of
         # competence is assumed.
-        for key in ('label', 'axis_points', 'current', 'comparitive'):
+        for key in ('label', 'axis_points', 'current', 'comparative'):
             if not result.has_key(key):
                 raise RuntimeError, "Key %s is required" % key
 
@@ -383,7 +383,7 @@ class BulletWidgetDecorator(WidgetDecorator):
                     green=dict(start=green[0], end=green[1])
                 ),
                 measure=dict(current=dict(start=current[0], end=current[1])),
-                comparitive=result['comparitive']
+                comparative=dict(point=result['comparative'])
             )
         )
 
