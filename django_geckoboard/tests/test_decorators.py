@@ -367,7 +367,7 @@ class BulletDecoratorTestCase(TestCase):
             'label':'Some label',
             'axis_points':[0, 200, 400, 600, 800, 1000],
             'current':500,
-            'comparitive':600,
+            'comparative':600,
             'auto_scale':False,
         }
 
@@ -385,7 +385,7 @@ class BulletDecoratorTestCase(TestCase):
         self.assertEqual(item['axis']['point'], [0, 200, 400, 600, 800, 1000])
         self.assertEqual(item['measure']['current']['start'], 0)
         self.assertEqual(item['measure']['current']['end'], 500)
-        self.assertEqual(item['comparitive'], 600)
+        self.assertEqual(item['comparative']['point'], 600)
         self.assertEqual(item['range']['red']['start'], 0)
         self.assertEqual(item['range']['red']['end'], 332)
         self.assertEqual(item['range']['amber']['start'], 333)
