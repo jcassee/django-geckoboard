@@ -1,6 +1,10 @@
 Changelog
 =========
 
+Version 1.2.2
+-------------
+* Fix comparative bar on bullet graphs (Rod Begbie)
+
 Version 1.2.1
 -------------
 * Fix unicode handling (Éric St-Jean)
