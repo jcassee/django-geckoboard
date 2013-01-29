@@ -5,7 +5,7 @@ Testing utilities.
 from django.conf import settings
 from django.core.management import call_command
 from django.db.models import loading
-from django.test.simple import run_tests as django_run_tests
+from django.test.utils import get_runner, setup_test_environment
 from django.test.testcases import TestCase as DjangoTestCase
 
 
@@ -13,7 +13,10 @@ def run_tests(labels=()):
     """
     Use the Django test runner to run the tests.
     """
-    django_run_tests(labels, verbosity=1, interactive=True)
+    setup_test_environment()
+    TestRunner = get_runner(settings)
+    test_runner = TestRunner(verbosity=1, interactive=True)
+    return test_runner.run_tests(None)
 
 
 class TestCase(DjangoTestCase):
