@@ -1,6 +1,10 @@
 Changelog
 =========
 
+Version 1.2.3
+-------------
+* Fix KeyError bug in auto-scaling code (Ben Belchak)
+
 Version 1.2.2
 -------------
 * Fix comparative bar on bullet graphs (Rod Begbie)
