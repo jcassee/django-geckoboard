@@ -361,7 +361,7 @@ class BulletWidgetDecorator(WidgetDecorator):
                 red = (scaler(red[0], scale), scaler(red[1], scale))
                 amber = (scaler(amber[0], scale), scaler(amber[1], scale))
                 green = (scaler(green[0], scale), scaler(green[1], scale))
-                result['comparitive'] = scaler(result['comparitive'], scale)
+                result['comparative'] = scaler(result['comparative'], scale)
 
                 # Suffix sublabel
                 sublabel = result.get('sublabel', '')

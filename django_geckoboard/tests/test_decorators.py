@@ -376,7 +376,7 @@ class BulletDecoratorTestCase(TestCase):
         widget = bullet(lambda r: self.bullet_data_minimal)
         resp = widget(self.request)
         # Parse
-        data = simplejson.loads(resp.content) 
+        data = simplejson.loads(resp.content)
         # Alias for readability
         item = data['item']
         # Tests
@@ -392,3 +392,27 @@ class BulletDecoratorTestCase(TestCase):
         self.assertEqual(item['range']['amber']['end'], 666)
         self.assertEqual(item['range']['green']['start'], 667)
         self.assertEqual(item['range']['green']['end'], 1000)
+
+    def test_auto_scale(self):
+        bullet_data = self.bullet_data_minimal.copy()
+        bullet_data['auto_scale'] = True
+        widget = bullet(lambda r: bullet_data)
+
+        resp = widget(self.request)
+        # Parse
+        data = simplejson.loads(resp.content)
+        # Alias for readability
+        item = data['item']
+        # Tests
+        self.assertEqual(data['orientation'], 'horizontal')
+        self.assertEqual(item['label'], "Some label")
+        self.assertEqual(item['axis']['point'], [0, 0.2, 0.4, 0.6, 0.8, 1.0])
+        self.assertEqual(item['measure']['current']['start'], 0)
+        self.assertEqual(item['measure']['current']['end'], 0.5)
+        self.assertEqual(item['comparative']['point'], 0.6)
+        self.assertEqual(item['range']['red']['start'], 0)
+        self.assertEqual(item['range']['red']['end'], .33)
+        self.assertEqual(item['range']['amber']['start'], .33)
+        self.assertEqual(item['range']['amber']['end'], .67)
+        self.assertEqual(item['range']['green']['start'], .67)
+        self.assertEqual(item['range']['green']['end'], 1.0)
