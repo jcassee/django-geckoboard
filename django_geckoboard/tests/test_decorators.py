@@ -55,12 +55,14 @@ class WidgetDecoratorTestCase(TestCase):
         resp = widget(lambda r: "test")(req)
         self.assertEqual('<?xml version="1.0" ?><root>test</root>',
                 resp.content)
+        self.assertEqual(resp._headers['content-type'], ('Content-Type', 'application/xml'))
 
     def test_json_get(self):
         req = HttpRequest()
         req.GET['format'] = '2'
         resp = widget(lambda r: "test")(req)
         self.assertEqual('"test"', resp.content)
+        self.assertEqual(resp._headers['content-type'], ('Content-Type', 'application/json'))
 
     def test_xml_post(self):
         req = HttpRequest()
@@ -68,12 +70,14 @@ class WidgetDecoratorTestCase(TestCase):
         resp = widget(lambda r: "test")(req)
         self.assertEqual('<?xml version="1.0" ?><root>test</root>',
                 resp.content)
+        self.assertEqual(resp._headers['content-type'], ('Content-Type', 'application/xml'))
 
     def test_json_post(self):
         req = HttpRequest()
         req.POST['format'] = '2'
         resp = widget(lambda r: "test")(req)
         self.assertEqual('"test"', resp.content)
+        self.assertEqual(resp._headers['content-type'], ('Content-Type', 'application/json'))
 
     def test_scalar_xml(self):
         resp = widget(lambda r: "test")(self.xml_request)
