@@ -336,6 +336,6 @@ http://support.geckoboard.com/entries/274940-custom-chart-widget-type-definition
 
 __author__ = "Joost Cassee"
 __email__ = "joost@cassee.net"
-__version__ = "1.2.3"
+__version__ = "1.2.4"
 __copyright__ = "Copyright (C) 2011 Joost Cassee and others"
 __license__ = "MIT License"

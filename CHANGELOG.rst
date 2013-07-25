@@ -1,6 +1,10 @@
 Changelog
 =========
 
+Version 1.2.4
+-------------
+* Add "Content-Type" header (Arthur Furlan)
+
 Version 1.2.3
 -------------
 * Fix KeyError bug in auto-scaling code (Ben Belchak)
