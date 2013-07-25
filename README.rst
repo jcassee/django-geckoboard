@@ -9,7 +9,7 @@ data.
 This Django application provides view decorators to help create custom
 widgets.  You can install the package from the `PyPI page`_::
 
-    $ easy_install django-geckoboard
+    $ pip install django-geckoboard
 
 Or use Git to get the development version from the `project page`_::
 
@@ -27,6 +27,7 @@ create an issue to discuss your plans.  People who have contributed:
 
 * Simon de Haan
 * Hedley Roos
+* Arthur Furlan
 
 Copyright (C) 2011 Joost Cassee <joost@cassee.net> and others.  This
 software is licensed under the MIT License (see LICENSE.txt).
