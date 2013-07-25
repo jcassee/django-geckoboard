@@ -42,8 +42,8 @@ class WidgetDecorator(object):
                 return HttpResponseForbidden("Geckoboard API key incorrect")
             view_result = view_func(request, *args, **kwargs)
             data = self._convert_view_result(view_result)
-            content = _render(request, data)
-            return HttpResponse(content)
+            content, content_type = _render(request, data)
+            return HttpResponse(content, content_type=content_type)
         wrapper = wraps(view_func, assigned=available_attrs(view_func))
         return csrf_exempt(wrapper(_wrapped_view))
 
@@ -423,14 +423,14 @@ def _render(request, data):
         return _render_xml(data)
 
 def _render_json(data):
-    return simplejson.dumps(data)
+    return simplejson.dumps(data), 'application/json'
 
 def _render_xml(data):
     doc = Document()
     root = doc.createElement('root')
     doc.appendChild(root)
     _build_xml(doc, root, data)
-    return doc.toxml()
+    return doc.toxml(), 'application/xml'
 
 def _build_xml(doc, parent, data):
     if isinstance(data, (tuple, list)):
