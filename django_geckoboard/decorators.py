@@ -66,7 +66,12 @@ class NumberWidgetDecorator(WidgetDecorator):
     def _convert_view_result(self, result):
         if not isinstance(result, (tuple, list)):
             result = [result]
-        return {'item': [{'value': v} for v in result if v is not None]}
+        content = {}
+        if not str(result[-1]).isdigit():
+            content['prefix'] = result[-1]
+            result = result[:-1]
+        content['item'] = [{'value': v} for v in result if v is not None]
+        return content
 
 number_widget = NumberWidgetDecorator()
 
