@@ -67,7 +67,7 @@ class NumberWidgetDecorator(WidgetDecorator):
         if not isinstance(result, (tuple, list)):
             result = [result]
         content = {}
-        if not str(result[-1]).isdigit():
+        if isinstance(result[-1], str):
             content['prefix'] = result[-1]
             result = result[:-1]
         content['item'] = [{'value': v} for v in result if v is not None]
