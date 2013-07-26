@@ -97,11 +97,12 @@ The following decorators are available from the
 
 Render a *Number & Secondary Stat* widget.
 
-The decorated view must return a tuple *(current, [previous])*, where
-the *current* parameter is the current value and optional *previous*
-parameter is the previous value of the measured quantity.  If there is
-only one parameter you do not need to return it in a tuple.  For
-example, to render a widget that shows the number of users and the
+The decorated view must return a tuple *(current, [previous],
+[prefix])* where the *current* parameter is the current value, optional
+*previous* parameter is the previous value of the measured quantity and
+the optional parameter *prefix* is the prefix used in Geckoboard widget.
+If there is only one parameter you do not need to return it in a tuple.
+For example, to render a widget that shows the number of users and the
 difference from last week::
 
     from django_geckoboard.decorators import number_widget
@@ -114,6 +115,13 @@ difference from last week::
         users = User.objects
         last_week_users = users.filter(date_joined__lt=last_week)
         return (users.count(), last_week_users.count())
+
+    @number_widget
+    def revenue_total(request):
+        revenue = Revenue.objects.current_month()
+        last_month_revenue = Revenue.objects.last_month()
+        return (revenue, last_month_revenue, '$')
+
 
 
 ``rag_widget``

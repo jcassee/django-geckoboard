@@ -58,9 +58,10 @@ class NumberWidgetDecorator(WidgetDecorator):
     """
     Geckoboard Number widget decorator.
 
-    The decorated view must return a tuple `(current, [previous])`, where
-    `current` is the current value and `previous` is the previous value
-    of the measured quantity.
+    The decorated view must return a tuple `(current, [previous], [prefix])`,
+    where `current` is the current value, `previous` is the previous value of
+    the measured quantity and `prefix` is the prefix used in the Geckoboard
+    widget.
     """
 
     def _convert_view_result(self, result):
