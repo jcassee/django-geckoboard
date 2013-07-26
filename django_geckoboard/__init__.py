@@ -117,11 +117,11 @@ difference from last week::
         return (users.count(), last_week_users.count())
 
     @number_widget
-    def revenue_total(request):
-        revenue = Revenue.objects.current_month()
-        last_month_revenue = Revenue.objects.last_month()
-        return (revenue, last_month_revenue, '$')
-
+    def users_count_with_prefix(request):
+        last_week = datetime.now() - timedelta(weeks=1)
+        users = User.objects
+        last_week_users = users.filter(date_joined__lt=last_week)
+        return (users.count(), last_week_users.count(), '$')
 
 
 ``rag_widget``
