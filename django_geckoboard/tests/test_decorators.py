@@ -146,7 +146,7 @@ class NumberDecoratorTestCase(TestCase):
         self.assertEqual('{"item": [{"value": 10}]}', resp.content)
 
     def test_single_value_and_prefix(self):
-        widget = number_widget(lambda r: [10, '$'])
+        widget = number_widget(prefix='$')(lambda r: [10])
         resp = widget(self.request)
         json = '{"item": [{"value": 10}], "prefix": "$"}'
         self.assertEqual(json, resp.content)
@@ -158,7 +158,7 @@ class NumberDecoratorTestCase(TestCase):
                 resp.content)
 
     def test_two_values_and_prefix(self):
-        widget = number_widget(lambda r: [10, 9, '$'])
+        widget = number_widget(prefix='$')(lambda r: [10, 9])
         resp = widget(self.request)
         json = '{"item": [{"value": 10}, {"value": 9}], "prefix": "$"}'
         self.assertEqual(json, resp.content)
@@ -349,13 +349,28 @@ class FunnelDecoratorTestCase(TestCase):
             "type": "reverse",
             "percentage": "hide"
         }
+        self.funnel_json = {
+            "items":[
+                {"value": 50, "label": "step 2"},
+                {"value": 100, "label": "step 1"},
+            ],
+            "type": "reverse",
+            "percentage": "hide"
+        }
 
     def test_funnel(self):
         widget = funnel(lambda r: self.funnel_data)
         resp = widget(self.request)
-        self.assertEqual('{"item": [{"value": 50, "label": "step 2"}, '
-                '{"value": 100, "label": "step 1"}], "type": "reverse", '
-                '"percentage": "hide"}', resp.content)
+        json = simplejson.loads(resp.content)
+        data = {
+            'type': 'reverse',
+            'percentage': 'hide',
+            'item': [
+                {'value': 50, 'label': 'step 2'},
+                {'value': 100, 'label': 'step 1'},
+            ],
+        }
+        self.assertEqual(json, data)
 
     def test_funnel_sorting(self):
         sortable_data = self.funnel_data
@@ -364,9 +379,16 @@ class FunnelDecoratorTestCase(TestCase):
         })
         widget = funnel(lambda r: sortable_data)
         resp = widget(self.request)
-        self.assertEqual('{"item": [{"value": 100, "label": "step 1"}, '
-                    '{"value": 50, "label": "step 2"}], "type": "reverse", '
-                    '"percentage": "hide"}', resp.content)
+        json = simplejson.loads(resp.content)
+        data = {
+            'type': 'reverse',
+            'percentage': 'hide',
+            'item': [
+                {'value': 100, 'label': 'step 1'},
+                {'value': 50, 'label': 'step 2'},
+            ],
+        }
+        self.assertEqual(json, data)
 
 
 class BulletDecoratorTestCase(TestCase):
