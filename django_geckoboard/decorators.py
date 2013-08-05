@@ -36,13 +36,25 @@ class WidgetDecorator(object):
     contain the correct API key, or a 403 Forbidden response is
     returned.
     """
+    def __new__(cls, *args, **kwargs):
+        obj = object.__new__(cls)
+        obj.data = kwargs
+        try:
+            return obj(args[0])
+        except IndexError:
+            return obj
+
     def __call__(self, view_func):
         def _wrapped_view(request, *args, **kwargs):
             if not _is_api_key_correct(request):
                 return HttpResponseForbidden("Geckoboard API key incorrect")
             view_result = view_func(request, *args, **kwargs)
             data = self._convert_view_result(view_result)
-            content, content_type = _render(request, data)
+            try:
+                self.data.update(data)
+            except ValueError:
+                self.data = data
+            content, content_type = _render(request, self.data)
             return HttpResponse(content, content_type=content_type)
         wrapper = wraps(view_func, assigned=available_attrs(view_func))
         return csrf_exempt(wrapper(_wrapped_view))
@@ -51,7 +63,7 @@ class WidgetDecorator(object):
         # Extending classes do view result mangling here.
         return data
 
-widget = WidgetDecorator()
+widget = WidgetDecorator
 
 
 class NumberWidgetDecorator(WidgetDecorator):
@@ -60,7 +72,7 @@ class NumberWidgetDecorator(WidgetDecorator):
 
     The decorated view must return a tuple `(current, [previous])`, where
     `current` is the current value and `previous` is the previous value
-    of the measured quantity.
+    of the measured quantity..
     """
 
     def _convert_view_result(self, result):
@@ -68,7 +80,7 @@ class NumberWidgetDecorator(WidgetDecorator):
             result = [result]
         return {'item': [{'value': v} for v in result if v is not None]}
 
-number_widget = NumberWidgetDecorator()
+number_widget = NumberWidgetDecorator
 
 
 class RAGWidgetDecorator(WidgetDecorator):
@@ -97,7 +109,7 @@ class RAGWidgetDecorator(WidgetDecorator):
             items.append(item)
         return {'item': items}
 
-rag_widget = RAGWidgetDecorator()
+rag_widget = RAGWidgetDecorator
 
 
 class TextWidgetDecorator(WidgetDecorator):
@@ -128,7 +140,7 @@ class TextWidgetDecorator(WidgetDecorator):
             items.append(item)
         return {'item': items}
 
-text_widget = TextWidgetDecorator()
+text_widget = TextWidgetDecorator
 
 
 class PieChartWidgetDecorator(WidgetDecorator):
@@ -154,7 +166,7 @@ class PieChartWidgetDecorator(WidgetDecorator):
             items.append(item)
         return {'item': items}
 
-pie_chart = PieChartWidgetDecorator()
+pie_chart = PieChartWidgetDecorator
 
 
 class LineChartWidgetDecorator(WidgetDecorator):
@@ -197,7 +209,7 @@ class LineChartWidgetDecorator(WidgetDecorator):
 
         return data
 
-line_chart = LineChartWidgetDecorator()
+line_chart = LineChartWidgetDecorator
 
 
 class GeckOMeterWidgetDecorator(WidgetDecorator):
@@ -233,7 +245,7 @@ class GeckOMeterWidgetDecorator(WidgetDecorator):
 
         return data
 
-geck_o_meter = GeckOMeterWidgetDecorator()
+geck_o_meter = GeckOMeterWidgetDecorator
 
 
 class FunnelWidgetDecorator(WidgetDecorator):
@@ -266,7 +278,7 @@ class FunnelWidgetDecorator(WidgetDecorator):
         data["percentage"] = result.get('percentage','show')
         return data
 
-funnel = FunnelWidgetDecorator()
+funnel = FunnelWidgetDecorator
 
 
 class BulletWidgetDecorator(WidgetDecorator):
@@ -396,7 +408,7 @@ class BulletWidgetDecorator(WidgetDecorator):
 
         return data
 
-bullet = BulletWidgetDecorator()
+bullet = BulletWidgetDecorator
 
 
 def _is_api_key_correct(request):
