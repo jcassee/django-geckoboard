@@ -1,6 +1,10 @@
 Changelog
 =========
 
+Version 1.2.5
+-------------
+* Add support for the "prefix" parameter (Arthur Furlan)
+
 Version 1.2.4
 -------------
 * Add "Content-Type" header (Arthur Furlan)
