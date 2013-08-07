@@ -145,10 +145,10 @@ class NumberDecoratorTestCase(TestCase):
         resp = widget(self.request)
         self.assertEqual('{"item": [{"value": 10}]}', resp.content)
 
-    def test_single_value_and_prefix(self):
-        widget = number_widget(prefix='$')(lambda r: [10])
+    def test_single_value_and_parameter(self):
+        widget = number_widget(absolute='true')(lambda r: [10])
         resp = widget(self.request)
-        json = '{"item": [{"value": 10}], "prefix": "$"}'
+        json = '{"item": [{"value": 10}], "absolute": "true"}'
         self.assertEqual(json, resp.content)
 
     def test_two_values(self):
@@ -157,10 +157,10 @@ class NumberDecoratorTestCase(TestCase):
         self.assertEqual('{"item": [{"value": 10}, {"value": 9}]}',
                 resp.content)
 
-    def test_two_values_and_prefix(self):
-        widget = number_widget(prefix='$')(lambda r: [10, 9])
+    def test_two_values_and_parameter(self):
+        widget = number_widget(absolute='true')(lambda r: [10, 9])
         resp = widget(self.request)
-        json = '{"item": [{"value": 10}, {"value": 9}], "prefix": "$"}'
+        json = '{"item": [{"value": 10}, {"value": 9}], "absolute": "true"}'
         self.assertEqual(json, resp.content)
 
 

@@ -60,7 +60,7 @@ django-geckoboard decorator::
 If your widget has optional settings, you can pass them in the decorator
 definition::
 
-    @number_widget(prefix='$', absolute='true', reverse='true')
+    @number_widget(absolute='true')
     def comment_count(request):
         midnight = datetime.combine(date.today(), time.min)
         return Comment.objects.filter(submit_date__gte=midnight).count()
@@ -354,6 +354,6 @@ http://support.geckoboard.com/entries/274940-custom-chart-widget-type-definition
 
 __author__ = "Joost Cassee"
 __email__ = "joost@cassee.net"
-__version__ = "1.2.4"
+__version__ = "1.2.5"
 __copyright__ = "Copyright (C) 2011 Joost Cassee and others"
 __license__ = "MIT License"
