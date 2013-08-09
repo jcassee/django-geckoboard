@@ -60,7 +60,7 @@ django-geckoboard decorator::
 If your widget has optional settings, you can pass them in the decorator
 definition::
 
-    @number_widget(prefix='$', absolute='true', reverse='true')
+    @number_widget(absolute='true')
     def comment_count(request):
         midnight = datetime.combine(date.today(), time.min)
         return Comment.objects.filter(submit_date__gte=midnight).count()
