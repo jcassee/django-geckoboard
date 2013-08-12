@@ -1,6 +1,10 @@
 Changelog
 =========
 
+Version 1.2.6
+-------------
+* Allow number widget to return list of dicts (Arthur Furlan)
+
 Version 1.2.5
 -------------
 * Add support for the "prefix" parameter (Arthur Furlan)
