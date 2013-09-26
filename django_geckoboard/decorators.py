@@ -38,6 +38,9 @@ class WidgetDecorator(object):
     """
     def __new__(cls, *args, **kwargs):
         obj = object.__new__(cls)
+        obj._format = None
+        if 'format' in kwargs:
+            obj._format = kwargs.pop('format')
         obj.data = kwargs
         try:
             return obj(args[0])
@@ -54,7 +57,7 @@ class WidgetDecorator(object):
                 self.data.update(data)
             except ValueError:
                 self.data = data
-            content, content_type = _render(request, self.data)
+            content, content_type = _render(request, self.data, self._format)
             return HttpResponse(content, content_type=content_type)
         wrapper = wraps(view_func, assigned=available_attrs(view_func))
         return csrf_exempt(wrapper(_wrapped_view))
@@ -427,11 +430,18 @@ def _is_api_key_correct(request):
     return False
 
 
-def _render(request, data):
-    """Render the data to Geckoboard based on the format request parameter."""
-    format = request.POST.get('format', '')
-    if not format:
-        format = request.GET.get('format', '')
+def _render(request, data, format=None):
+    if format:
+        if format == "json":
+            return _render_json(data)
+        else:
+            """Just default to XML"""
+            return _render_xml(data)
+    else:
+        """Render the data to Geckoboard based on the format request parameter."""
+        format = request.POST.get('format', '')
+        if not format:
+            format = request.GET.get('format', '')
     if format == '2':
         return _render_json(data)
     else:
