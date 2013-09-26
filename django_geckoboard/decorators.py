@@ -431,14 +431,13 @@ def _is_api_key_correct(request):
 
 
 def _render(request, data, format=None):
+    """Render the data to Geckoboard based on the format request parameter or the format argument supplied to the decorator. Default to XML"""
     if format:
         if format == "json":
             return _render_json(data)
         else:
-            """Just default to XML"""
             return _render_xml(data)
     else:
-        """Render the data to Geckoboard based on the format request parameter."""
         format = request.POST.get('format', '')
         if not format:
             format = request.GET.get('format', '')
