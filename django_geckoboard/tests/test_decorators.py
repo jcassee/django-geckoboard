@@ -64,6 +64,14 @@ class WidgetDecoratorTestCase(TestCase):
         self.assertEqual('"test"', resp.content)
         self.assertEqual(resp._headers['content-type'], ('Content-Type', 'application/json'))
 
+    def test_encrypted_json_get(self):
+        req = HttpRequest()
+        req.GET['format'] = '2'
+        resp = widget(encrypted=True)(lambda r: "test")(req)
+        self.assertNotEqual('"test"', resp.content)
+        self.assertEqual(44, len(resp.content))
+        self.assertEqual(resp._headers['content-type'], ('Content-Type', 'application/json'))
+
     def test_xml_post(self):
         req = HttpRequest()
         req.POST['format'] = '1'
