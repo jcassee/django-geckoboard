@@ -56,6 +56,13 @@ django-geckoboard decorator::
         midnight = datetime.combine(date.today(), time.min)
         return Comment.objects.filter(submit_date__gte=midnight).count()
 
+You can also specify the output format of the widget as either JSON or XML::
+
+   @number_widget(format='json')
+   def comment_count(request):
+        midnight = datatime.combine(date.today(), time.min)
+        return Comment.objects.filter(submit_data__get=midnight).count()
+
 
 If your widget has optional settings, you can pass them in the decorator
 definition::
@@ -91,8 +98,10 @@ Widget type
     *Custom*
 
 Feed format
-    Either *XML* or *JSON*.  The view decorators will automatically
-    detect and output the correct format.
+    Either *XML* or *JSON*.  If you don't specify a format the decorators will
+    automatically detect and output the correct format or default to XML 
+    if this is not enabled (by default the format isn't appended by 
+    Geckoboard as a parameter any more)
 
 Request type
     Either *GET* or *POST*.  The view decorators accept both.
