@@ -3,11 +3,16 @@ Geckoboard decorators.
 """
 
 import base64
-from Crypto.Cipher import AES
-from Crypto import Random
-from hashlib import md5
 from types import ListType, TupleType
 from xml.dom.minidom import Document
+
+try:
+    from Crypto.Cipher import AES
+    from Crypto import Random
+    from hashlib import md5
+    encryption_enabled = True
+except ImportError:
+    encryption_enabled = False
 
 try:
     from functools import wraps
@@ -46,6 +51,12 @@ class WidgetDecorator(object):
         obj = object.__new__(cls)
         obj._encrypted = None
         if 'encrypted' in kwargs:
+            if not encryption_enabled:
+                raise GeckoboardException(
+                    'Use of encryption requires the pycrypto package. ' + \
+                    'This package can be installed manually or by enabling ' + \
+                    'the encryption feature during installation.'
+                )
             obj._encrypted = kwargs.pop('encrypted')        
         obj.data = kwargs
         try:

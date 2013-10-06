@@ -37,7 +37,7 @@ visiting the widget URL.
 Encryption
 ==========
 
-Geckoboard encryption allows encrypting data before it is sent to Geckoboard’s 
+Geckoboard encryption allows encrypting data before it is sent to Geckoboard's 
 servers. After entering the password used to encrypt the data when the Geckoboard
 is loaded, the data will be decrypted in the browser.
 
