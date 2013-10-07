@@ -468,17 +468,19 @@ def _encrypt(data):
     return base64.b64encode(encrypted)
 
 def _render(request, data, encrypted, format=None):
-    """Render the data to Geckoboard based on the format request parameter."""
-    if format:
-        if format == "json":
-            return _render_json(data, encrypted)
-        else:
-            return _render_xml(data, encrypted)
-    else:
+    """
+    Render the data to Geckoboard. If the `format` parameter is passed
+    to the widget it defines the output format. Otherwise the output
+    format is based on the `format` request parameter.
+
+    A `format` paramater of ``json`` or ``2`` renders JSON output, any
+    other value renders XML.
+    """
+    if not format:
         format = request.POST.get('format', '')
-        if not format:
-            format = request.GET.get('format', '')
-    if format == '2':
+    if not format:
+        format = request.GET.get('format', '')
+    if format == 'json' or format == '2':
         return _render_json(data, encrypted)
     else:
         return _render_xml(data, encrypted)
@@ -491,7 +493,7 @@ def _render_json(data, encrypted=False):
 
 def _render_xml(data, encrypted=False):
     if encrypted:
-        raise ValueError("encryption requested for XML output but not supported")
+        raise ValueError("encryption requested for XML output but unsupported")
     doc = Document()
     root = doc.createElement('root')
     doc.appendChild(root)
