@@ -4,6 +4,7 @@ Changelog
 Development
 -----------
 * Add support for encryption (Jeremy A. Johnson)
+* Allow setting output format in widget decorator (Rob Hudson)
 
 Version 1.2.6
 -------------
