@@ -51,6 +51,13 @@ class WidgetDecoratorTestCase(TestCase):
 
     def test_xml_get(self):
         req = HttpRequest()
+        resp = widget(format="xml")(lambda r: "test")(req)
+        self.assertEqual('<?xml version="1.0" ?><root>test</root>',
+                resp.content)
+        self.assertEqual(resp._headers['content-type'], ('Content-Type', 'application/xml'))
+
+    def test_xml_parameter_get(self):
+        req = HttpRequest()
         req.GET['format'] = '1'
         resp = widget(lambda r: "test")(req)
         self.assertEqual('<?xml version="1.0" ?><root>test</root>',
@@ -59,10 +66,23 @@ class WidgetDecoratorTestCase(TestCase):
 
     def test_json_get(self):
         req = HttpRequest()
+        resp = widget(format="json")(lambda r: "test")(req)
+        self.assertEqual('"test"', resp.content)
+        self.assertEqual(resp._headers['content-type'], ('Content-Type', 'application/json'))
+
+    def test_json_parameter_get(self):
+        req = HttpRequest()
         req.GET['format'] = '2'
         resp = widget(lambda r: "test")(req)
         self.assertEqual('"test"', resp.content)
         self.assertEqual(resp._headers['content-type'], ('Content-Type', 'application/json'))
+
+    def test_wrong_format(self):
+        req = HttpRequest()
+        resp = widget(format="csv")(lambda r: "test")(req)
+        self.assertEqual('<?xml version="1.0" ?><root>test</root>',
+                resp.content)
+        self.assertEqual(resp._headers['content-type'], ('Content-Type', 'application/xml'))
 
     def test_encrypted_json_get(self):
         req = HttpRequest()
@@ -155,6 +175,14 @@ class NumberDecoratorTestCase(TestCase):
 
     def test_single_value_and_parameter(self):
         widget = number_widget(absolute='true')(lambda r: [10])
+        resp = widget(self.request)
+        json = '{"item": [{"value": 10}], "absolute": "true"}'
+        self.assertEqual(json, resp.content)
+
+    def test_single_value_and_parameter_with_format(self):
+        # reset POST
+        del self.request.POST['format']
+        widget = number_widget(absolute='true', format="json")(lambda r: [10])
         resp = widget(self.request)
         json = '{"item": [{"value": 10}], "absolute": "true"}'
         self.assertEqual(json, resp.content)
