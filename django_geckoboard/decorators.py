@@ -473,7 +473,7 @@ def _render(request, data, encrypted, format=None):
         if format == "json":
             return _render_json(data, encrypted)
         else:
-            return _render_xml(data)
+            return _render_xml(data, encrypted)
     else:
         format = request.POST.get('format', '')
         if not format:
@@ -481,7 +481,7 @@ def _render(request, data, encrypted, format=None):
     if format == '2':
         return _render_json(data, encrypted)
     else:
-        return _render_xml(data)
+        return _render_xml(data, encrypted)
 
 def _render_json(data, encrypted=False):
     data_json = simplejson.dumps(data)
@@ -489,7 +489,9 @@ def _render_json(data, encrypted=False):
         data_json = _encrypt(data_json)
     return data_json, 'application/json'
 
-def _render_xml(data):
+def _render_xml(data, encrypted=False):
+    if encrypted:
+        raise ValueError("encryption requested for XML output but not supported")
     doc = Document()
     root = doc.createElement('root')
     doc.appendChild(root)
