@@ -1,6 +1,10 @@
 Changelog
 =========
 
+Development
+-----------
+* Add support for encryption (Jeremy A. Johnson)
+
 Version 1.2.6
 -------------
 * Allow number widget to return list of dicts (Arthur Furlan)
@@ -27,23 +31,23 @@ Version 1.2.1
 
 Version 1.2.0
 -------------
-* Added *bullet* widget decorator contributed by Hedley Roos.
+* Add *bullet* widget decorator (Hedley Roos)
 
 Version 1.1.0
 -------------
-* Added *funnel* widget decorator contributed by Simon de Haan.
+* Add *funnel* widget decorator (Simon de Haan)
 
 Version 1.0.0
 -------------
-* No changes from 0.2.1.
+* No changes from 0.2.1
 
 Version 0.2.1
 -------------
-* Fixed API key detection.
+* Fix API key detection
 
 Version 0.2.0
 -------------
-* Renamed widget decorators.
+* Rename widget decorators
 
 Version 0.1.0
 -------------

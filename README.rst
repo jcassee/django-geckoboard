@@ -28,6 +28,7 @@ create an issue to discuss your plans.  People who have contributed:
 * Simon de Haan
 * Hedley Roos
 * Arthur Furlan
+* Jeremy A. Johnson
 
 Copyright (C) 2011 Joost Cassee <joost@cassee.net> and others.  This
 software is licensed under the MIT License (see LICENSE.txt).
