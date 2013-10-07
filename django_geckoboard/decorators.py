@@ -7,6 +7,14 @@ from types import ListType, TupleType
 from xml.dom.minidom import Document
 
 try:
+    from Crypto.Cipher import AES
+    from Crypto import Random
+    from hashlib import md5
+    encryption_enabled = True
+except ImportError:
+    encryption_enabled = False
+
+try:
     from functools import wraps
 except ImportError:
     from django.utils.functional import wraps  # Python 2.4 fallback
@@ -35,9 +43,21 @@ class WidgetDecorator(object):
     If the ``GECKOBOARD_API_KEY`` setting is used, the request must
     contain the correct API key, or a 403 Forbidden response is
     returned.
+
+    If the ``encrypted` argument is set to True, then the data will be 
+    encrypted using ``GECKOBOARD_PASSWORD`` (JSON only).
     """
     def __new__(cls, *args, **kwargs):
         obj = object.__new__(cls)
+        obj._encrypted = None
+        if 'encrypted' in kwargs:
+            if not encryption_enabled:
+                raise GeckoboardException(
+                    'Use of encryption requires the pycrypto package. ' + \
+                    'This package can be installed manually or by enabling ' + \
+                    'the encryption feature during installation.'
+                )
+            obj._encrypted = kwargs.pop('encrypted')        
         obj.data = kwargs
         try:
             return obj(args[0])
@@ -54,7 +74,7 @@ class WidgetDecorator(object):
                 self.data.update(data)
             except ValueError:
                 self.data = data
-            content, content_type = _render(request, self.data)
+            content, content_type = _render(request, self.data, self._encrypted)
             return HttpResponse(content, content_type=content_type)
         wrapper = wraps(view_func, assigned=available_attrs(view_func))
         return csrf_exempt(wrapper(_wrapped_view))
@@ -426,19 +446,39 @@ def _is_api_key_correct(request):
             return request_key == api_key
     return False
 
+def _derive_key_and_iv(password, salt, key_length, iv_length):
+    d = d_i = ''
+    while len(d) < key_length + iv_length:
+        d_i = md5(d_i + password + salt).digest()
+        d += d_i
+    return d[:key_length], d[key_length:key_length+iv_length]
 
-def _render(request, data):
+def _encrypt(data):
+    """Equivalent to OpenSSL using 256 bit AES in CBC mode"""
+    BS = AES.block_size
+    pad = lambda s: s + (BS - len(s) % BS) * chr(BS - len(s) % BS) 
+    password = settings.GECKOBOARD_PASSWORD
+    salt = Random.new().read(BS - len('Salted__'))
+    key, iv = _derive_key_and_iv(password, salt, 32, BS)
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    encrypted = 'Salted__' + salt + cipher.encrypt(pad(data))
+    return base64.b64encode(encrypted)
+
+def _render(request, data, encrypted):
     """Render the data to Geckoboard based on the format request parameter."""
     format = request.POST.get('format', '')
     if not format:
         format = request.GET.get('format', '')
     if format == '2':
-        return _render_json(data)
+        return _render_json(data, encrypted)
     else:
         return _render_xml(data)
 
-def _render_json(data):
-    return simplejson.dumps(data), 'application/json'
+def _render_json(data, encrypted=False):
+    data_json = simplejson.dumps(data)
+    if encrypted:
+        data_json = _encrypt(data_json)
+    return data_json, 'application/json'
 
 def _render_xml(data):
     doc = Document()

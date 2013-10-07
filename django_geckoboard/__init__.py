@@ -34,6 +34,24 @@ If you do not set an API key, anyone will be able to view the data by
 visiting the widget URL.
 
 
+Encryption
+==========
+
+Geckoboard encryption allows encrypting data before it is sent to Geckoboard's 
+servers. After entering the password used to encrypt the data when the Geckoboard
+is loaded, the data will be decrypted in the browser.
+
+To use encryption, first set a password in the project ``settings.py`` file::
+
+    GECKOBOARD_PASSWORD = 'XXXXXXXXX'
+    
+Next, enable encryption for each widget using the decorator arguments::
+
+@number_widget(encrypted=True)
+    def user_count(request):
+        return User.objects.count()
+
+
 Creating custom widgets
 =======================
 
@@ -79,6 +97,9 @@ This is all the Django code you need to display the comment count on
 your dashboard. When you create a custom widget in Geckoboard, enter the
 following information:
 
+Encryption
+    Enable if the field is encrypted (see instructions above).
+    
 URL data feed
     The view URL.  In the example above this would be something like
     ``http://HOSTNAME/geckoboard/comment_count/``.
