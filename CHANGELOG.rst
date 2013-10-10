@@ -2,7 +2,7 @@ Changelog
 =========
 
 Version 1.2.7
------------
+-------------
 * Add support for encryption (Jeremy A. Johnson)
 * Allow setting output format in widget decorator (Rob Hudson)
 

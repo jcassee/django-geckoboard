@@ -47,9 +47,9 @@ To use encryption, first set a password in the project ``settings.py`` file::
     
 Next, enable encryption for each widget using the decorator arguments::
 
-@number_widget(encrypted=True)
-    def user_count(request):
-        return User.objects.count()
+    @number_widget(encrypted=True)
+        def user_count(request):
+            return User.objects.count()
 
 
 Creating custom widgets
