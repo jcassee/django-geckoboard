@@ -31,8 +31,8 @@ create an issue to discuss your plans.  People who have contributed:
 * Jeremy A. Johnson
 * Rob Hudson
 
-Copyright (C) 2011 Joost Cassee <joost@cassee.net> and others.  This
-software is licensed under the MIT License (see LICENSE.txt).
+Copyright (C) 2011-2013 Joost Cassee <joost@cassee.net> and others.
+This software is licensed under the MIT License (see LICENSE.txt).
 
 Thanks go to Geckoboard for their support, and to GitHub for hosting the
 project source code and issue tracker.
