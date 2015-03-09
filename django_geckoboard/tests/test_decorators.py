@@ -2,7 +2,7 @@
 Tests for the Geckoboard decorators.
 """
 
-import simplejson
+import json
 from django.http import HttpRequest, HttpResponseForbidden
 from django.utils.datastructures import SortedDict
 
@@ -426,8 +426,8 @@ class FunnelDecoratorTestCase(TestCase):
     def test_funnel(self):
         widget = funnel(lambda r: self.funnel_data)
         resp = widget(self.request)
-        json = simplejson.loads(resp.content)
-        data = {
+        content = json.loads(resp.content)
+        expected = {
             'type': 'reverse',
             'percentage': 'hide',
             'item': [
@@ -435,7 +435,7 @@ class FunnelDecoratorTestCase(TestCase):
                 {'value': 100, 'label': 'step 1'},
             ],
         }
-        self.assertEqual(json, data)
+        self.assertEqual(content, expected)
 
     def test_funnel_sorting(self):
         sortable_data = self.funnel_data
@@ -444,8 +444,8 @@ class FunnelDecoratorTestCase(TestCase):
         })
         widget = funnel(lambda r: sortable_data)
         resp = widget(self.request)
-        json = simplejson.loads(resp.content)
-        data = {
+        content = json.loads(resp.content)
+        expected = {
             'type': 'reverse',
             'percentage': 'hide',
             'item': [
@@ -453,7 +453,7 @@ class FunnelDecoratorTestCase(TestCase):
                 {'value': 50, 'label': 'step 2'},
             ],
         }
-        self.assertEqual(json, data)
+        self.assertEqual(content, expected)
 
 
 class BulletDecoratorTestCase(TestCase):
@@ -479,7 +479,7 @@ class BulletDecoratorTestCase(TestCase):
         widget = bullet(lambda r: self.bullet_data_minimal)
         resp = widget(self.request)
         # Parse
-        data = simplejson.loads(resp.content)
+        data = json.loads(resp.content)
         # Alias for readability
         item = data['item']
         # Tests
@@ -503,7 +503,7 @@ class BulletDecoratorTestCase(TestCase):
 
         resp = widget(self.request)
         # Parse
-        data = simplejson.loads(resp.content)
+        data = json.loads(resp.content)
         # Alias for readability
         item = data['item']
         # Tests

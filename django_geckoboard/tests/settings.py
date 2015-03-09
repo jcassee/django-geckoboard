@@ -13,3 +13,5 @@ INSTALLED_APPS = [
     'django_geckoboard',
 ]
 GECKOBOARD_PASSWORD = 'pass123'
+
+SECRET_KEY = 'test'
