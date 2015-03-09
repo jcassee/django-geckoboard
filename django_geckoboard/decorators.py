@@ -24,7 +24,8 @@ from django.http import HttpResponse, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.datastructures import SortedDict
 from django.utils.decorators import available_attrs
-from django.utils import simplejson
+
+import json
 
 
 TEXT_NONE = 0
@@ -486,7 +487,7 @@ def _render(request, data, encrypted, format=None):
         return _render_xml(data, encrypted)
 
 def _render_json(data, encrypted=False):
-    data_json = simplejson.dumps(data)
+    data_json = json.dumps(data)
     if encrypted:
         data_json = _encrypt(data_json)
     return data_json, 'application/json'
