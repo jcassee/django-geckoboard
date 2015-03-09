@@ -1,6 +1,10 @@
 Changelog
 =========
 
+Version 1.2.8
+-------------
+* Use json package directly (Max Lynch)
+
 Version 1.2.7
 -------------
 * Add support for encryption (Jeremy A. Johnson)

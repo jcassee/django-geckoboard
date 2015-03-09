@@ -37,14 +37,14 @@ visiting the widget URL.
 Encryption
 ==========
 
-Geckoboard encryption allows encrypting data before it is sent to Geckoboard's 
+Geckoboard encryption allows encrypting data before it is sent to Geckoboard's
 servers. After entering the password used to encrypt the data when the Geckoboard
 is loaded, the data will be decrypted in the browser.
 
 To use encryption, first set a password in the project ``settings.py`` file::
 
     GECKOBOARD_PASSWORD = 'XXXXXXXXX'
-    
+
 Next, enable encryption for each widget using the decorator arguments::
 
     @number_widget(encrypted=True)
@@ -106,7 +106,7 @@ following information:
 
 Encryption
     Enable if the field is encrypted (see instructions above).
-    
+
 URL data feed
     The view URL.  In the example above this would be something like
     ``http://HOSTNAME/geckoboard/comment_count/``.
@@ -120,8 +120,8 @@ Widget type
 
 Feed format
     Either *XML* or *JSON*.  If you don't specify a format the decorators will
-    automatically detect and output the correct format or default to XML 
-    if this is not enabled (by default the format isn't appended by 
+    automatically detect and output the correct format or default to XML
+    if this is not enabled (by default the format isn't appended by
     Geckoboard as a parameter any more)
 
 Request type
@@ -384,6 +384,6 @@ http://support.geckoboard.com/entries/274940-custom-chart-widget-type-definition
 
 __author__ = "Joost Cassee"
 __email__ = "joost@cassee.net"
-__version__ = "1.2.7"
+__version__ = "1.2.8"
 __copyright__ = "Copyright (C) 2011-2013 Joost Cassee and others"
 __license__ = "MIT License"
