@@ -1,6 +1,14 @@
 django-geckoboard
 =================
 
+.. note::
+
+    *django-geckoboard is looking for a new maintainer.*
+
+    I am no longer actively using Django, which means I am slow in
+    responding to tickets and applying pull requests.  If you are
+    interested, please get in touch.
+
 Geckoboard_ is a hosted, real-time status board serving up indicators
 from web analytics, CRM, support, infrastructure, project management,
 sales, etc.  It can be connected to virtually any source of quantitative
