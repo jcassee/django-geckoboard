@@ -50,10 +50,7 @@ setup(
         'django_geckoboard',
         'django_geckoboard.tests',
     ],
-    install_requires=['six', 'django'],
-    extras_require={
-        'encryption': ['pycrypto']
-    },
+    install_requires=['six', 'django', 'pycrypto'],
     keywords=['django', 'geckoboard'],
     classifiers=[
         'Development Status :: 4 - Beta',

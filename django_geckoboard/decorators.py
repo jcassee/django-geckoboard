@@ -5,23 +5,17 @@ from __future__ import absolute_import
 
 from collections import OrderedDict
 from functools import wraps
+from hashlib import md5
 from xml.dom.minidom import Document
 import base64
 import json
 
-
-try:
-    from Crypto.Cipher import AES
-    from Crypto import Random
-    from hashlib import md5
-    encryption_enabled = True
-except ImportError:
-    encryption_enabled = False
-
+from Crypto import Random
+from Crypto.Cipher import AES
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseForbidden
-from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import available_attrs
+from django.views.decorators.csrf import csrf_exempt
 import six
 
 
@@ -49,12 +43,6 @@ class WidgetDecorator(object):
         obj = object.__new__(cls)
         obj._encrypted = None
         if 'encrypted' in kwargs:
-            if not encryption_enabled:
-                raise GeckoboardException(
-                    'Use of encryption requires the pycrypto package. '
-                    'This package can be installed manually or by enabling '
-                    'the encryption feature during installation.'
-                )
             obj._encrypted = kwargs.pop('encrypted')
         obj._format = None
         if 'format' in kwargs:
