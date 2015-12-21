@@ -3,10 +3,10 @@ Tests for the Geckoboard decorators.
 """
 
 import base64
+from collections import OrderedDict
 import json
 
 from django.http import HttpRequest, HttpResponseForbidden
-from django.utils.datastructures import SortedDict
 from django_geckoboard.decorators import (
     widget, number_widget, rag_widget,
     text_widget, pie_chart, line_chart, geck_o_meter, TEXT_NONE,
@@ -135,13 +135,13 @@ class WidgetDecoratorTestCase(TestCase):
         self.assertEqual(b'"test"', resp.content)
 
     def test_dict_xml(self):
-        w = widget(lambda r: SortedDict([('a', 1), ('b', 2)]))
+        w = widget(lambda r: OrderedDict([('a', 1), ('b', 2)]))
         resp = w(self.xml_request)
         self.assertXMLEqual('<?xml version="1.0" ?><root><a>1</a><b>2</b></root>',
                             resp.content.decode('utf8'))
 
     def test_dict_json(self):
-        data = SortedDict([('a', 1), ('b', 2)])
+        data = OrderedDict([('a', 1), ('b', 2)])
         resp = widget(lambda r: data)(self.json_request)
         self.assertJSONEqual('{"a": 1, "b": 2}', resp.content.decode('utf8'))
 
@@ -166,8 +166,8 @@ class WidgetDecoratorTestCase(TestCase):
             resp.content.decode('utf8'))
 
     def test_dict_list_json(self):
-        data = [SortedDict([('value', 1), ('text', "test1")]),
-                SortedDict([('value', 2), ('text', "test2")])]
+        data = [OrderedDict([('value', 1), ('text', "test1")]),
+                OrderedDict([('value', 2), ('text', "test2")])]
         resp = widget(lambda r: {'item': data})(self.json_request)
         self.assertJSONEqual(
             ('{"item": [{"value": 1, "text": "test1"}, '
