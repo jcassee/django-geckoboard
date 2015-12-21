@@ -51,8 +51,8 @@ class WidgetDecorator(object):
         if 'encrypted' in kwargs:
             if not encryption_enabled:
                 raise GeckoboardException(
-                    'Use of encryption requires the pycrypto package. ' + \
-                    'This package can be installed manually or by enabling ' + \
+                    'Use of encryption requires the pycrypto package. '
+                    'This package can be installed manually or by enabling '
                     'the encryption feature during installation.'
                 )
             obj._encrypted = kwargs.pop('encrypted')
@@ -527,7 +527,9 @@ def _build_list_xml(doc, parent, data):
 
 
 def _build_dict_xml(doc, parent, data):
-    for tag, item in data.items():
+    tags = sorted(data.keys())  # order tags testing ease
+    for tag in tags:
+        item = data[tag]
         if isinstance(item, (list, tuple)):
             for subitem in item:
                 elem = doc.createElement(tag)

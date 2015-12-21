@@ -26,15 +26,7 @@ def to_u(s):
     return six.text_type(s)
 
 
-class JsonCompare(object):
-    def assertSameJson(self, jsons1, jsons2):
-        jsons1 = to_u(jsons1)
-        jsons2 = to_u(jsons2)
-
-        self.assertEqual(json.loads(jsons1), json.loads(jsons2))
-
-
-class WidgetDecoratorTestCase(TestCase, JsonCompare):
+class WidgetDecoratorTestCase(TestCase):
     """
     Tests for the ``widget`` decorator.
     """
@@ -143,15 +135,15 @@ class WidgetDecoratorTestCase(TestCase, JsonCompare):
         self.assertEqual(b'"test"', resp.content)
 
     def test_dict_xml(self):
-        resp = widget(lambda r: SortedDict([('a', 1),
-                                            ('b', 2)]))(self.xml_request)
-        self.assertEqual(b'<?xml version="1.0" ?><root><a>1</a><b>2</b></root>',
-                         resp.content)
+        w = widget(lambda r: SortedDict([('a', 1), ('b', 2)]))
+        resp = w(self.xml_request)
+        self.assertXMLEqual('<?xml version="1.0" ?><root><a>1</a><b>2</b></root>',
+                            resp.content.decode('utf8'))
 
     def test_dict_json(self):
         data = SortedDict([('a', 1), ('b', 2)])
         resp = widget(lambda r: data)(self.json_request)
-        self.assertSameJson('{"a": 1, "b": 2}', resp.content)
+        self.assertJSONEqual('{"a": 1, "b": 2}', resp.content.decode('utf8'))
 
     def test_list_xml(self):
         resp = widget(lambda r: {'list': [1, 2, 3]})(self.xml_request)
@@ -162,7 +154,7 @@ class WidgetDecoratorTestCase(TestCase, JsonCompare):
 
     def test_list_json(self):
         resp = widget(lambda r: {'list': [1, 2, 3]})(self.json_request)
-        self.assertSameJson('{"list": [1, 2, 3]}', resp.content)
+        self.assertJSONEqual('{"list": [1, 2, 3]}', resp.content.decode('utf8'))
 
     def test_dict_list_xml(self):
         resp = widget(lambda r: {'item': [{'value': 1, 'text': "test1"},
@@ -177,13 +169,13 @@ class WidgetDecoratorTestCase(TestCase, JsonCompare):
         data = [SortedDict([('value', 1), ('text', "test1")]),
                 SortedDict([('value', 2), ('text', "test2")])]
         resp = widget(lambda r: {'item': data})(self.json_request)
-        self.assertSameJson(
+        self.assertJSONEqual(
             ('{"item": [{"value": 1, "text": "test1"}, '
              '{"value": 2, "text": "test2"}]}'),
-            resp.content)
+            resp.content.decode('utf8'))
 
 
-class NumberDecoratorTestCase(TestCase, JsonCompare):
+class NumberDecoratorTestCase(TestCase):
     """
     Tests for the ``number`` decorator.
     """
@@ -197,18 +189,18 @@ class NumberDecoratorTestCase(TestCase, JsonCompare):
     def test_scalar(self):
         widget = number_widget(lambda r: 10)
         resp = widget(self.request)
-        self.assertSameJson('{"item": [{"value": 10}]}', resp.content)
+        self.assertJSONEqual('{"item": [{"value": 10}]}', resp.content.decode('utf8'))
 
     def test_single_value(self):
         widget = number_widget(lambda r: [10])
         resp = widget(self.request)
-        self.assertSameJson('{"item": [{"value": 10}]}', resp.content)
+        self.assertJSONEqual('{"item": [{"value": 10}]}', resp.content.decode('utf8'))
 
     def test_single_value_and_parameter(self):
         widget = number_widget(absolute='true')(lambda r: [10])
         resp = widget(self.request)
         json = '{"item": [{"value": 10}], "absolute": "true"}'
-        self.assertSameJson(json, resp.content)
+        self.assertJSONEqual(json, resp.content.decode('utf8'))
 
     def test_single_value_and_parameter_with_format(self):
         # reset POST
@@ -216,46 +208,46 @@ class NumberDecoratorTestCase(TestCase, JsonCompare):
         widget = number_widget(absolute='true', format="json")(lambda r: [10])
         resp = widget(self.request)
         json = '{"item": [{"value": 10}], "absolute": "true"}'
-        self.assertSameJson(json, resp.content)
+        self.assertJSONEqual(json, resp.content.decode('utf8'))
 
     def test_single_value_as_dictionary(self):
         widget = number_widget(lambda r: [{'value': 10}])
         resp = widget(self.request)
         json = '{"item": [{"value": 10}]}'
-        self.assertSameJson(json, resp.content)
+        self.assertJSONEqual(json, resp.content.decode('utf8'))
 
     def test_single_value_as_dictionary_with_prefix(self):
         widget = number_widget(lambda r: [{'value': 10, 'prefix': '$'}])
         resp = widget(self.request)
         json = '{"item": [{"prefix": "$", "value": 10}]}'
-        self.assertSameJson(json, resp.content)
+        self.assertJSONEqual(json, resp.content.decode('utf8'))
 
     def test_two_values(self):
         widget = number_widget(lambda r: [10, 9])
         resp = widget(self.request)
-        self.assertSameJson('{"item": [{"value": 10}, {"value": 9}]}',
-                            resp.content)
+        self.assertJSONEqual('{"item": [{"value": 10}, {"value": 9}]}',
+                             resp.content.decode('utf8'))
 
     def test_two_values_and_parameter(self):
         widget = number_widget(absolute='true')(lambda r: [10, 9])
         resp = widget(self.request)
         json = '{"item": [{"value": 10}, {"value": 9}], "absolute": "true"}'
-        self.assertSameJson(json, resp.content)
+        self.assertJSONEqual(json, resp.content.decode('utf8'))
 
     def test_two_values_as_dictionary(self):
         widget = number_widget(lambda r: [{'value': 10}, {'value': 9}])
         resp = widget(self.request)
         json = '{"item": [{"value": 10}, {"value": 9}]}'
-        self.assertSameJson(json, resp.content)
+        self.assertJSONEqual(json, resp.content.decode('utf8'))
 
     def test_two_values_as_dictionary_with_prefix(self):
         widget = number_widget(lambda r: [{'value': 10, 'prefix': '$'}, {'value': 9}])
         resp = widget(self.request)
         json = '{"item": [{"prefix": "$", "value": 10}, {"value": 9}]}'
-        self.assertSameJson(json, resp.content)
+        self.assertJSONEqual(json, resp.content.decode('utf8'))
 
 
-class RAGDecoratorTestCase(TestCase, JsonCompare):
+class RAGDecoratorTestCase(TestCase):
     """
     Tests for the ``rag`` decorator.
     """
@@ -269,20 +261,20 @@ class RAGDecoratorTestCase(TestCase, JsonCompare):
     def test_scalars(self):
         widget = rag_widget(lambda r: (10, 5, 1))
         resp = widget(self.request)
-        self.assertSameJson(
+        self.assertJSONEqual(
             '{"item": [{"value": 10}, {"value": 5}, {"value": 1}]}',
-            resp.content)
+            resp.content.decode('utf8'))
 
     def test_tuples(self):
         widget = rag_widget(lambda r: ((10, "ten"), (5, "five"), (1, "one")))
         resp = widget(self.request)
-        self.assertSameJson(
+        self.assertJSONEqual(
             ('{"item": [{"value": 10, "text": "ten"}, '
              '{"value": 5, "text": "five"}, {"value": 1, "text": "one"}]}'),
-            resp.content)
+            resp.content.decode('utf8'))
 
 
-class TextDecoratorTestCase(TestCase, JsonCompare):
+class TextDecoratorTestCase(TestCase):
     """
     Tests for the ``text`` decorator.
     """
@@ -296,16 +288,16 @@ class TextDecoratorTestCase(TestCase, JsonCompare):
     def test_string(self):
         widget = text_widget(lambda r: "test message")
         resp = widget(self.request)
-        self.assertSameJson('{"item": [{"text": "test message", "type": 0}]}',
-                            resp.content)
+        self.assertJSONEqual('{"item": [{"text": "test message", "type": 0}]}',
+                             resp.content.decode('utf8'))
 
     def test_list(self):
         widget = text_widget(lambda r: ["test1", "test2"])
         resp = widget(self.request)
-        self.assertSameJson(
+        self.assertJSONEqual(
             ('{"item": [{"text": "test1", "type": 0}, '
              '{"text": "test2", "type": 0}]}'),
-            resp.content)
+            resp.content.decode('utf8'))
 
     def test_list_tuples(self):
         data = [("test1", TEXT_NONE),
@@ -313,14 +305,14 @@ class TextDecoratorTestCase(TestCase, JsonCompare):
                 ("test3", TEXT_WARN)]
         widget = text_widget(lambda r: data)
         resp = widget(self.request)
-        self.assertSameJson(
+        self.assertJSONEqual(
             ('{"item": [{"text": "test1", "type": 0}, '
              '{"text": "test2", "type": 2}, '
              '{"text": "test3", "type": 1}]}'),
-            resp.content)
+            resp.content.decode('utf8'))
 
 
-class PieChartDecoratorTestCase(TestCase, JsonCompare):
+class PieChartDecoratorTestCase(TestCase):
     """
     Tests for the ``pie_chart`` decorator.
     """
@@ -334,40 +326,40 @@ class PieChartDecoratorTestCase(TestCase, JsonCompare):
     def test_scalars(self):
         widget = pie_chart(lambda r: [1, 2, 3])
         resp = widget(self.request)
-        self.assertSameJson(
+        self.assertJSONEqual(
             '{"item": [{"value": 1}, {"value": 2}, {"value": 3}]}',
-            resp.content)
+            resp.content.decode('utf8'))
 
     def test_tuples(self):
         widget = pie_chart(lambda r: [(1, ), (2, ), (3, )])
         resp = widget(self.request)
-        self.assertSameJson(
+        self.assertJSONEqual(
             '{"item": [{"value": 1}, {"value": 2}, {"value": 3}]}',
-            resp.content)
+            resp.content.decode('utf8'))
 
     def test_2tuples(self):
         widget = pie_chart(lambda r: [(1, "one"), (2, "two"), (3, "three")])
         resp = widget(self.request)
-        self.assertSameJson(
+        self.assertJSONEqual(
             ('{"item": [{"value": 1, "label": "one"}, '
              '{"value": 2, "label": "two"}, '
              '{"value": 3, "label": "three"}]}'),
-            resp.content)
+            resp.content.decode('utf8'))
 
     def test_3tuples(self):
         data = [(1, "one", "00112233"),
                 (2, "two", "44556677"), (3, "three", "8899aabb")]
         widget = pie_chart(lambda r: data)
         resp = widget(self.request)
-        self.assertSameJson(
+        self.assertJSONEqual(
             ('{"item": ['
              '{"value": 1, "label": "one", "colour": "00112233"}, '
              '{"value": 2, "label": "two", "colour": "44556677"}, '
              '{"value": 3, "label": "three", "colour": "8899aabb"}]}'),
-            resp.content)
+            resp.content.decode('utf8'))
 
 
-class LineChartDecoratorTestCase(TestCase, JsonCompare):
+class LineChartDecoratorTestCase(TestCase):
     """
     Tests for the ``line_chart`` decorator.
     """
@@ -381,24 +373,24 @@ class LineChartDecoratorTestCase(TestCase, JsonCompare):
     def test_values(self):
         widget = line_chart(lambda r: ([1, 2, 3],))
         resp = widget(self.request)
-        self.assertSameJson('{"item": [1, 2, 3], "settings": {}}', resp.content)
+        self.assertJSONEqual('{"item": [1, 2, 3], "settings": {}}', resp.content.decode('utf8'))
 
     def test_x_axis(self):
         widget = line_chart(lambda r: ([1, 2, 3], ["first", "last"]))
         resp = widget(self.request)
-        self.assertSameJson(
+        self.assertJSONEqual(
             '{"item": [1, 2, 3], "settings": {"axisx": ["first", "last"]}}',
-            resp.content)
+            resp.content.decode('utf8'))
 
     def test_axes(self):
         widget = line_chart(lambda r: ([1, 2, 3],
                                        ["first", "last"],
                                        ["low", "high"]))
         resp = widget(self.request)
-        self.assertSameJson(
+        self.assertJSONEqual(
             ('{"item": [1, 2, 3], "settings": '
              '{"axisx": ["first", "last"], "axisy": ["low", "high"]}}'),
-            resp.content)
+            resp.content.decode('utf8'))
 
     def test_color(self):
         widget = line_chart(lambda r: ([1, 2, 3],
@@ -406,14 +398,14 @@ class LineChartDecoratorTestCase(TestCase, JsonCompare):
                                        ["low", "high"],
                                        "00112233"))
         resp = widget(self.request)
-        self.assertSameJson(
+        self.assertJSONEqual(
             ('{"item": [1, 2, 3], "settings": '
              '{"axisx": ["first", "last"], "axisy": ["low", "high"], '
              '"colour": "00112233"}}'),
-            resp.content)
+            resp.content.decode('utf8'))
 
 
-class GeckOMeterDecoratorTestCase(TestCase, JsonCompare):
+class GeckOMeterDecoratorTestCase(TestCase):
     """
     Tests for the ``line_chart`` decorator.
     """
@@ -427,20 +419,20 @@ class GeckOMeterDecoratorTestCase(TestCase, JsonCompare):
     def test_scalars(self):
         widget = geck_o_meter(lambda r: (2, 1, 3))
         resp = widget(self.request)
-        self.assertSameJson(
+        self.assertJSONEqual(
             '{"item": 2, "max": {"value": 3}, "min": {"value": 1}}',
-            resp.content)
+            resp.content.decode('utf8'))
 
     def test_tuples(self):
         widget = geck_o_meter(lambda r: (2, (1, "min"), (3, "max")))
         resp = widget(self.request)
-        self.assertSameJson(
+        self.assertJSONEqual(
             ('{"item": 2, "max": {"value": 3, "text": "max"}, '
              '"min": {"value": 1, "text": "min"}}'),
-            resp.content)
+            resp.content.decode('utf8'))
 
 
-class FunnelDecoratorTestCase(TestCase, JsonCompare):
+class FunnelDecoratorTestCase(TestCase):
     """
     Tests for the ``funnel`` decorator
     """
@@ -500,7 +492,7 @@ class FunnelDecoratorTestCase(TestCase, JsonCompare):
         self.assertEqual(content, expected)
 
 
-class BulletDecoratorTestCase(TestCase, JsonCompare):
+class BulletDecoratorTestCase(TestCase):
     """
     Tests for the ``bullet`` decorator
     """
