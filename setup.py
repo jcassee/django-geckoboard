@@ -1,5 +1,7 @@
-from setuptools import setup, Command
 import os
+import sys
+
+from setuptools import setup, Command
 
 import django_geckoboard
 
@@ -22,7 +24,9 @@ class TestCommand(Command):
 
     def run(self):
         from django_geckoboard.tests.utils import run_tests
-        run_tests()
+        errors = run_tests()
+        if errors:
+            sys.exit(1)
 
 cmdclass['test'] = TestCommand
 
