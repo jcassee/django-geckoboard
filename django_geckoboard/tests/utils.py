@@ -5,7 +5,6 @@ from __future__ import absolute_import
 
 from django.conf import settings
 from django.core.management import call_command
-from django.db.models import loading
 from django.test.testcases import TestCase as DjangoTestCase
 from django.test.utils import get_runner
 import django
@@ -70,7 +69,6 @@ class TestSettingsManager(object):
                 pass  # setting did not exist
 
     def syncdb(self):
-        loading.cache.loaded = False
         call_command('syncdb', verbosity=0, interactive=False)
 
     def revert(self):
