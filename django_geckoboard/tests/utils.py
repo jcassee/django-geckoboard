@@ -1,12 +1,14 @@
 """
 Testing utilities.
 """
+from __future__ import absolute_import
 
 from django.conf import settings
 from django.core.management import call_command
 from django.db.models import loading
 from django.test.utils import get_runner, setup_test_environment
 from django.test.testcases import TestCase as DjangoTestCase
+import six
 
 
 def run_tests(labels=()):
@@ -50,9 +52,9 @@ class TestSettingsManager(object):
         self._original_settings = {}
 
     def set(self, **kwargs):
-        for k, v in kwargs.iteritems():
+        for k, v in six.iteritems(kwargs):
             self._original_settings.setdefault(k, getattr(settings, k,
-                    self.NO_SETTING))
+                                                          self.NO_SETTING))
             setattr(settings, k, v)
         if 'INSTALLED_APPS' in kwargs:
             self.syncdb()
@@ -61,7 +63,7 @@ class TestSettingsManager(object):
         for k in args:
             try:
                 self._original_settings.setdefault(k, getattr(settings, k,
-                        self.NO_SETTING))
+                                                              self.NO_SETTING))
                 delattr(settings, k)
             except AttributeError:
                 pass  # setting did not exist
@@ -71,7 +73,7 @@ class TestSettingsManager(object):
         call_command('syncdb', verbosity=0, interactive=False)
 
     def revert(self):
-        for k,v in self._original_settings.iteritems():
+        for k, v in six.iteritems(self._original_settings):
             if v == self.NO_SETTING:
                 if hasattr(settings, k):
                     delattr(settings, k)

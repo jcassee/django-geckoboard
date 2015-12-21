@@ -1,10 +1,13 @@
 """
 Geckoboard decorators.
 """
+from __future__ import absolute_import
 
-import base64
-from types import ListType, TupleType
+from functools import wraps
 from xml.dom.minidom import Document
+import base64
+import json
+
 
 try:
     from Crypto.Cipher import AES
@@ -14,18 +17,12 @@ try:
 except ImportError:
     encryption_enabled = False
 
-try:
-    from functools import wraps
-except ImportError:
-    from django.utils.functional import wraps  # Python 2.4 fallback
-
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.datastructures import SortedDict
 from django.utils.decorators import available_attrs
-
-import json
+import six
 
 
 TEXT_NONE = 0
@@ -45,7 +42,7 @@ class WidgetDecorator(object):
     contain the correct API key, or a 403 Forbidden response is
     returned.
 
-    If the ``encrypted` argument is set to True, then the data will be 
+    If the ``encrypted` argument is set to True, then the data will be
     encrypted using ``GECKOBOARD_PASSWORD`` (JSON only).
     """
     def __new__(cls, *args, **kwargs):
@@ -58,7 +55,7 @@ class WidgetDecorator(object):
                     'This package can be installed manually or by enabling ' + \
                     'the encryption feature during installation.'
                 )
-            obj._encrypted = kwargs.pop('encrypted')        
+            obj._encrypted = kwargs.pop('encrypted')
         obj._format = None
         if 'format' in kwargs:
             obj._format = kwargs.pop('format')
@@ -300,9 +297,9 @@ class FunnelWidgetDecorator(WidgetDecorator):
         if result.get('sort'):
             items.sort(reverse=True)
 
-        data["item"] = [dict(zip(("value","label"), item)) for item in items]
+        data["item"] = [{"value": k, "label": v} for k, v in items]
         data["type"] = result.get('type', 'standard')
-        data["percentage"] = result.get('percentage','show')
+        data["percentage"] = result.get('percentage', 'show')
         return data
 
 funnel = FunnelWidgetDecorator
@@ -344,16 +341,15 @@ class BulletWidgetDecorator(WidgetDecorator):
         # Check required keys. We do not do type checking since this level of
         # competence is assumed.
         for key in ('label', 'axis_points', 'current', 'comparative'):
-            if not result.has_key(key):
-                raise RuntimeError, "Key %s is required" % key
+            if key not in result:
+                raise RuntimeError("Key %s is required" % key)
 
         # Handle singleton current and projected
         current = result['current']
         projected = result.get('projected', None)
-        if not isinstance(current, (ListType, TupleType)):
+        if not isinstance(current, (list, tuple)):
             current = [0, current]
-        if (projected is not None) and not isinstance(projected, (ListType,
-                TupleType)):
+        if (projected is not None) and not isinstance(projected, (list, tuple)):
             projected = [0, projected]
 
         # If red, amber and green are not *all* supplied calculate defaults
@@ -365,7 +361,7 @@ class BulletWidgetDecorator(WidgetDecorator):
             if axis_points:
                 max_point = max(axis_points)
                 min_point = min(axis_points)
-                third = (max_point - min_point) / 3
+                third = (max_point - min_point) // 3
                 red = (min_point, min_point + third - 1)
                 amber = (min_point + third, max_point - third - 1)
                 green = (max_point - third, max_point)
@@ -377,7 +373,7 @@ class BulletWidgetDecorator(WidgetDecorator):
         auto_scale = result.get('auto_scale', True)
         if auto_scale and axis_points:
             scale_label_map = {1000000000: 'billions', 1000000: 'millions',
-                    1000: 'thousands'}
+                               1000: 'thousands'}
             scale = 1
             value = max(axis_points)
             for n in (1000000000, 1000000, 1000):
@@ -396,7 +392,7 @@ class BulletWidgetDecorator(WidgetDecorator):
                 current = (scaler(current[0], scale), scaler(current[1], scale))
                 if projected is not None:
                     projected = (scaler(projected[0], scale),
-                            scaler(projected[1], scale))
+                                 scaler(projected[1], scale))
                 red = (scaler(red[0], scale), scaler(red[1], scale))
                 amber = (scaler(amber[0], scale), scaler(amber[1], scale))
                 green = (scaler(green[0], scale), scaler(green[1], scale))
@@ -405,8 +401,8 @@ class BulletWidgetDecorator(WidgetDecorator):
                 # Suffix sublabel
                 sublabel = result.get('sublabel', '')
                 if sublabel:
-                    result['sublabel'] = '%s (%s)' % \
-                            (sublabel, scale_label_map[scale])
+                    result['sublabel'] = '%s (%s)' % (sublabel,
+                                                      scale_label_map[scale])
                 else:
                     result['sublabel'] = scale_label_map[scale].capitalize()
 
@@ -427,11 +423,11 @@ class BulletWidgetDecorator(WidgetDecorator):
         )
 
         # Add optional items
-        if result.has_key('sublabel'):
+        if 'sublabel' in result:
             data['item']['sublabel'] = result['sublabel']
         if projected is not None:
             data['item']['measure']['projected'] = dict(start=projected[0],
-                    end=projected[1])
+                                                        end=projected[1])
 
         return data
 
@@ -445,28 +441,36 @@ def _is_api_key_correct(request):
         return True
     auth = request.META.get('HTTP_AUTHORIZATION', '').split()
     if len(auth) == 2:
-        if auth[0].lower() == 'basic':
-            request_key = base64.b64decode(auth[1]).split(':')[0]
+        if auth[0].lower() == b'basic':
+            request_key = base64.b64decode(auth[1]).split(b':')[0]
             return request_key == api_key
     return False
 
+
 def _derive_key_and_iv(password, salt, key_length, iv_length):
-    d = d_i = ''
+    d = d_i = b''
     while len(d) < key_length + iv_length:
         d_i = md5(d_i + password + salt).digest()
         d += d_i
     return d[:key_length], d[key_length:key_length+iv_length]
 
+
 def _encrypt(data):
     """Equivalent to OpenSSL using 256 bit AES in CBC mode"""
     BS = AES.block_size
-    pad = lambda s: s + (BS - len(s) % BS) * chr(BS - len(s) % BS) 
+
+    def pad(s):
+        n = BS - len(s) % BS
+        char = chr(n).encode('utf8')
+        return s + n * char
+
     password = settings.GECKOBOARD_PASSWORD
     salt = Random.new().read(BS - len('Salted__'))
     key, iv = _derive_key_and_iv(password, salt, 32, BS)
     cipher = AES.new(key, AES.MODE_CBC, iv)
-    encrypted = 'Salted__' + salt + cipher.encrypt(pad(data))
+    encrypted = b'Salted__' + salt + cipher.encrypt(pad(data))
     return base64.b64encode(encrypted)
+
 
 def _render(request, data, encrypted, format=None):
     """
@@ -486,11 +490,13 @@ def _render(request, data, encrypted, format=None):
     else:
         return _render_xml(data, encrypted)
 
+
 def _render_json(data, encrypted=False):
-    data_json = json.dumps(data)
+    data_json = json.dumps(data).encode('utf8')
     if encrypted:
         data_json = _encrypt(data_json)
     return data_json, 'application/json'
+
 
 def _render_xml(data, encrypted=False):
     if encrypted:
@@ -501,6 +507,7 @@ def _render_xml(data, encrypted=False):
     _build_xml(doc, root, data)
     return doc.toxml(), 'application/xml'
 
+
 def _build_xml(doc, parent, data):
     if isinstance(data, (tuple, list)):
         _build_list_xml(doc, parent, data)
@@ -509,12 +516,15 @@ def _build_xml(doc, parent, data):
     else:
         _build_str_xml(doc, parent, data)
 
+
 def _build_str_xml(doc, parent, data):
-    parent.appendChild(doc.createTextNode(unicode(data)))
+    parent.appendChild(doc.createTextNode(six.text_type(data)))
+
 
 def _build_list_xml(doc, parent, data):
     for item in data:
         _build_xml(doc, parent, item)
+
 
 def _build_dict_xml(doc, parent, data):
     for tag, item in data.items():

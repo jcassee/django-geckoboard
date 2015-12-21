@@ -9,6 +9,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'django_geckoboard.tests.settings'
 
 cmdclass = {}
 
+
 class TestCommand(Command):
     description = "run package tests"
     user_options = []
@@ -29,30 +30,32 @@ cmdclass['test'] = TestCommand
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
+
 def build_long_description():
     return "\n\n".join([
-        django_geckoboard.__doc__,  #@UndefinedVariable
+        django_geckoboard.__doc__,
         read('CHANGELOG.rst'),
     ])
 
 
 setup(
-    name = 'django-geckoboard',
-    version = django_geckoboard.__version__,
-    license = django_geckoboard.__license__,
-    description = 'Geckoboard custom widgets for Django projects',
-    long_description = build_long_description(),
-    author = django_geckoboard.__author__,
-    author_email = django_geckoboard.__email__,
-    packages = [
+    name='django-geckoboard',
+    version=django_geckoboard.__version__,
+    license=django_geckoboard.__license__,
+    description='Geckoboard custom widgets for Django projects',
+    long_description=build_long_description(),
+    author=django_geckoboard.__author__,
+    author_email=django_geckoboard.__email__,
+    packages=[
         'django_geckoboard',
         'django_geckoboard.tests',
     ],
-    extras_require = {
+    install_requires=['six', 'django'],
+    extras_require={
         'encryption': ['pycrypto']
     },
-    keywords = ['django', 'geckoboard'],
-    classifiers = [
+    keywords=['django', 'geckoboard'],
+    classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
         'Framework :: Django',
@@ -63,8 +66,8 @@ setup(
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
-    platforms = ['any'],
-    url = 'http://github.com/jcassee/django-geckoboard',
-    download_url = 'http://github.com/jcassee/django-geckoboard/archives/master',
-    cmdclass = cmdclass,
+    platforms=['any'],
+    url='http://github.com/jcassee/django-geckoboard',
+    download_url='http://github.com/jcassee/django-geckoboard/archives/master',
+    cmdclass=cmdclass,
 )
