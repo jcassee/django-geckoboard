@@ -6,8 +6,9 @@ from __future__ import absolute_import
 from django.conf import settings
 from django.core.management import call_command
 from django.db.models import loading
-from django.test.utils import get_runner, setup_test_environment
 from django.test.testcases import TestCase as DjangoTestCase
+from django.test.utils import get_runner
+import django
 import six
 
 
@@ -15,7 +16,7 @@ def run_tests(labels=()):
     """
     Use the Django test runner to run the tests.
     """
-    setup_test_environment()
+    django.setup()
     TestRunner = get_runner(settings)
     test_runner = TestRunner(verbosity=1, interactive=True)
     return test_runner.run_tests(None)
