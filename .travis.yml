@@ -1,11 +1,10 @@
 language: python
 
 python:
+  - "2.7"
+  - "3.4"
   - "3.5"
 
 script:
-  - which python
-  - which pip
-  - python --version
   - pip install .
   - python setup.py test
