@@ -1,13 +1,14 @@
 django-geckoboard
 =================
 
-.. note::
-
-    *django-geckoboard is looking for a new maintainer.*
+.. note:: django-geckoboard is looking for a new maintainer.
 
     I am no longer actively using Django, which means I am slow in
     responding to tickets and applying pull requests.  If you are
     interested, please get in touch.
+
+
+.. note:: Version 2.0.0 drops support for Python < 2.7 and Django < 1.8.
 
 Geckoboard_ is a hosted, real-time status board serving up indicators
 from web analytics, CRM, support, infrastructure, project management,
@@ -38,6 +39,7 @@ create an issue to discuss your plans.  People who have contributed:
 * Arthur Furlan
 * Jeremy A. Johnson
 * Rob Hudson
+* Matt Terry
 
 Copyright (C) 2011-2013 Joost Cassee <joost@cassee.net> and others.
 This software is licensed under the MIT License (see LICENSE.txt).

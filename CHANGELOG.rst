@@ -1,6 +1,13 @@
 Changelog
 =========
 
+Version 2.0.0
+-------------
+
+* Add support for Python 3.4 and 4.5 and drop support for Python < 2.7;
+  add support for Django 1.9 and drop support for Django < 1.8
+  (Matt Terry)
+
 Version 1.2.8
 -------------
 * Use json package directly (Max Lynch)
