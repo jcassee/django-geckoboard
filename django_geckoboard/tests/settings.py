@@ -12,6 +12,6 @@ DATABASES = {
 INSTALLED_APPS = [
     'django_geckoboard',
 ]
-GECKOBOARD_PASSWORD = 'pass123'
+GECKOBOARD_PASSWORD = b'pass123'
 
-SECRET_KEY = 'test'
+SECRET_KEY = b'test'
